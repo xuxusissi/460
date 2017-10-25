@@ -1,0 +1,39 @@
+<!doctype html>
+
+<title>Photoshare</title>
+{% if name %}
+  <h1>Hello {{ name }}!</h1>
+{% endif %}
+
+{% if albums %}
+<h2>Here's your Albums</h2>
+    <ul>
+    {% for album in albums %}
+
+        <li>{{album[1]}}<br>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+    <body>
+        <div class="title">
+            <h1>Create an album for yourself</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/create">
+                <label for="name">Name of the album:</label>
+                <input type="text" name="name" required='true' /><br />
+                <label for="time">Time of creation:</label>
+                <input type="TIMESTAMP" name="time" required='true' /><br />
+                <input type="submit" value="Create" />
+            </form>
+    </body>
+    <body>
+        <div class="title">
+            <h1>Delete an album</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/deletealbum">
+                <label for="album_name">Name of the album:</label>
+                <input type="NAME" name="album_name" required='true' /><br />
+                <input type="submit" value="Delete" />
+            </form>
+    </body>

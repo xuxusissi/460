@@ -1,0 +1,55 @@
+<!-- author ben lawson (balawson@bu.edu) -->
+<!doctype html>
+{% if message %}
+  <h4>{{message}}!</h4>
+{% endif %}
+<title>Photoshare</title>
+{% if name %}
+  <h1>Hello {{ name }}!</h1>
+{% endif %}
+
+{% if photos %}
+<h2>Here's your photos</h2>
+    <ul>
+    {% for photo in photos %}
+
+        <li>{{photo[2]}}<br>
+        <img src='data:image/png;base64, {{photo[0]}}'/></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if message is none %}
+  <p>You should <a href='/login'>login!</a></p>
+{% else %}
+  <p> Go to <a href='/profile'>profile?</a></p>
+{% endif %}
+
+    <body>
+        <div class="title">
+            <h1>View your photos by tags</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/viewy">
+                <label for="tag">tag name:</label>
+                <input type="text" name="tag" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>
+    <body>
+        <div class="title">
+            <h1>Search for all photos by tags</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/viewall">
+                <label for="tag">tag name:</label>
+                <input type="text" name="tag" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>
+<ul>
+    <li><a href='/addfriends'>See your friend list or add friends</a></li>
+    <li><a href='/create'>Album edit</a> </li>
+<li><a href='/upload'>Photo edit</a> </li>
+<li><a href='/logout'>Logout</a></li>
+<li><a href='/'>Home</a></li>
+</ul>
+

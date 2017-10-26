@@ -10,7 +10,7 @@
 ###################################################
 
 import flask
-from flask import Flask, Response, request, render_template, redirect, url_for
+from flask import Flask, Response, request, render_template, redirect, url_for, session
 from flaskext.mysql import MySQL
 import flask.ext.login as flask_login
 
@@ -102,6 +102,7 @@ def login():
         data = cursor.fetchall()
         pwd = str(data[0][0])
         if flask.request.form['password'] == pwd:
+            session['logged_in'] = True
             user = User()
             user.id = email
             flask_login.login_user(user)  # okay login in user
@@ -115,6 +116,7 @@ def login():
 @app.route('/logout')
 def logout():
     flask_login.logout_user()
+    session['logged_in'] = False
     return render_template('hello.html', message='Logged out')
 
 
@@ -242,7 +244,7 @@ def isTagUnique(tag):
 
 def getAllPhoto():
     cursor = conn.cursor()
-    cursor.execute("SELECT DATA,CAPTION FROM PHOTO")
+    cursor.execute("SELECT DATA,CAPTION,PID FROM PHOTO")
     return cursor.fetchall()
 
 
@@ -257,16 +259,64 @@ def getAllTagPhoto(tag):
     cursor=conn.cursor()
     print("SELECT DATA,CAPTION FROM PHOTO WHERE PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{0}')".format(tag))
     cursor.execute("SELECT DATA,CAPTION FROM PHOTO WHERE PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{0}')".format(tag))
-
     return cursor.fetchall()
+
+def getAllTagsPhoto(tags):
+    list
+    for t in tags:
+        photo = getAllTagPhoto(t)
+        list.add(photo)
+
 
 def mostTag():
     cursor=conn.cursor()
     cursor.execute("SELECT HASHTAG FROM ASSOCIATE GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
     return cursor.fetchall()
 
+def getYourTagPhoto(tag,uid):
+    cursor=conn.cursor()
+    print("SELECT P.CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID={0} AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
+    cursor.execute("SELECT DATA,CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID={0} AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
+    return cursor.fetchall()
 
+def getAIDFromPID(pid):
+    cursor=conn.cursor()
+    print(cursor.execute("SELECT AID FROM PHOTO WHERE PID={0}".format(pid)))
+    cursor.execute("SELECT AID FROM PHOTO WHERE PID={0}".format(pid))
+    return cursor.fetchall()[0][0]
 
+def getUIDFromPID(pid):
+    aid=getAIDFromPID(pid)
+    print(cursor.execute("SELECT UID FROM ALBUM WHERE AID={0}".format(aid)))
+    cursor.execute("SELECT UID FROM ALBUM WHERE AID={0}".format(aid))
+    return cursor.fetchall()[0][0]
+
+def selfComment(uid,pid):
+    uid_p=getUIDFromPID(pid)
+    print(uid_p)
+    print(uid)
+    print(pid)
+    if uid==uid_p:
+        return True
+    else:
+        return False
+
+def activeUsers():
+    cursor=conn.cursor()
+    cursor.execute("SELECT FNAME,LNAME FROM USER ORDER BY CONTRIBUTION DESC LIMIT 5")
+    return cursor.fetchall()
+
+def isCommentUnique(comment):
+    cursor = conn.cursor()
+    if cursor.execute("SELECT CONTENT FROM COMMENT WHERE CONTENT = '{0}'".format(comment)):
+        return False
+    else:
+        return True
+
+def user_by_comment(content):
+    cursor=conn.cursor()
+    cursor.execute("SELECT FNAME,LNAME FROM USER WHERE UID IN (SELECT UID FROM COMMENT WHERE CONTENT='{0}') GROUP BY UID ORDER BY COUNT(*) DESC".format(content))
+    return cursor.fetchall()
 # end login code
 
 @app.route('/profile')
@@ -274,7 +324,7 @@ def mostTag():
 def protected():
     uid=getUserIdFromEmail(flask_login.current_user.id)
     return render_template('hello.html', name=flask_login.current_user.id, message="Here's your profile",
-                           photos=getAllPhoto())
+                           photos=getAllPhoto(),activities=activeUsers())
 
 
 # begin photo uploading code
@@ -303,6 +353,7 @@ def upload_file():
         print("INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
         cursor.execute(
             "INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
+        cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
         conn.commit()
         #for i in range(0,len(tag_list)-1):
         if isTagUnique(tag):
@@ -319,7 +370,7 @@ def upload_file():
                 "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
             conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!',
-                             photos=getAllPhoto(),tags=mostTag())
+                             photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
         # The method is GET so we return a  HTML form to upload the a photo.
     else:
         return render_template('upload.html')
@@ -340,7 +391,7 @@ def creat_album():
             "INSERT INTO ALBUM (NAME, UID, DOC) VALUES ('{0}', {1}, '{2}' )".format(aname, uid, time))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Album Created!',
-                               photos=getAllPhoto(), albums=getUsersAlbumName(uid), tags=mostTag())
+                               photos=getAllPhoto(), albums=getUsersAlbumName(uid), tags=mostTag(),activities=activeUsers())
     else:
         return render_template('create.html', name=flask_login.current_user.id,
                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
@@ -356,7 +407,7 @@ def delete_album():
             "DELETE FROM ALBUM WHERE (NAME) VALUES ('{0}')".format(aname))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Album Deleted!',
-                                   photos=getAllPhoto(),tags=mostTag())
+                                   photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
     else:
         return render_template('create.html', name=flask_login.current_user.id,
                                 albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id))
@@ -374,7 +425,7 @@ def delete_photo():
             "DELETE FROM PHOTO WHERE CAPTION='{0}'".format(caption))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted!',
-                                   photos=getAllPhoto(),tags=mostTag())
+                                   photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
     else:
         return render_template('upload.html')
 
@@ -383,16 +434,19 @@ def delete_photo():
 @app.route('/viewy', methods=['POST'])
 @flask_login.login_required
 def view_your_photo():
-    tags = request.form.get('tag')
-    list_tag = tags.split(' ')
-    return render_template('hello.html', name=flask_login.current_user.id, message='Photo searched!',
-                               photos=getAllPhoto(),tags=mostTag())
+    tag = request.form.get('tag')
+    uid=getUserIdFromEmail(flask_login.current_user.id)
+    return render_template('viewyour.html', tag_photo_your=getYourTagPhoto(tag,uid))
 
 
 @app.route('/viewall', methods=['POST'])
 def view_all_photo():
     tag = request.form.get('tag')
-    return render_template('view.html', tag_photo_all=getAllTagPhoto(tag))
+    if isTagUnique(tag):
+        return render_template('hello.html', name=flask_login.current_user.id, message='No photo with this tag!',
+                                  photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+    else:
+        return render_template('viewall.html', tag_photo_all=getAllTagPhoto(tag))
 
 
 
@@ -405,7 +459,7 @@ def add_friends():
         email = request.form.get('email')
         if isEmailUnique(email):
             return render_template('hello.html', name=flask_login.current_user.id, message='Friend does not exist!',
-                                  photos=getAllPhoto())
+                                  photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
         else:
             uid2 = getUserIdFromEmail(email)
             uid1 = getUserIdFromEmail(flask_login.current_user.id)
@@ -418,9 +472,48 @@ def add_friends():
     else:
         return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
 # default page
+
+@app.route('/comment', methods=['POST'])
+@flask_login.login_required
+def add_comment():
+    pid=request.form.get('pid')
+    content=request.form.get('comment')
+    date=request.form.get('date')
+    if not session.get('logged_in'):
+        print("not logged in")
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0,pid,date,content))
+        conn.commit()
+        return render_template('hello.html',message='Your comment is added anonymously!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+    else:
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        if selfComment(uid,pid):
+            return render_template('hello.html',message='you cannot leave comments to your own photo',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+        else:
+            cursor=conn.cursor()
+            cursor.execute("INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES({0},{1},'{2}','{3}')".format(uid,pid,date,content))
+            cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
+            conn.commit()
+            return render_template('hello.html',message='Your comment is added!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+
+@app.route('/searchcomment', methods=['POST'])
+@flask_login.login_required
+def search_comment():
+    content=request.form.get('content')
+    if isCommentUnique(content):
+        return render_template("hello.html",message="comments don not exist")
+    else:
+        return render_template("hello.html",message="users found!",contributors=user_by_comment(content))
+
+
+
+
+
+
 @app.route("/", methods=['GET'])
 def hello():
-    return render_template('hello.html', message='Welcome to Photoshare!', photos = getAllPhoto(),tags=mostTag())
+    return render_template('hello.html', message='Welcome to Photoshare!', photos = getAllPhoto(),tags=mostTag(),activities=activeUsers())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,16 @@
+<!doctype html>
+
+<title>View all</title>
+
+
+{% if  tag_photo_your %}
+<h2>Here's all your photos with the tag you entered</h2>
+     <ul>
+    {% for each in  tag_photo_your %}
+
+        <li>{{each[1]}}<br>
+        <img src='data:image/png;base64, {{each[0]}}'/></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+

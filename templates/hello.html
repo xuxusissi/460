@@ -13,8 +13,19 @@
     <ul>
     {% for photo in photos %}
 
-        <li>{{photo[1]}}<br>
+        <li>Photo ID:{{photo[2]}}<br>
+            Photo caption:{{photo[1]}}<br>
+        </li>>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
+        <form method="post" enctype="multipart/form-data" action="/comment">
+                <label for="comment">leave your comment:</label>
+                <input type="COMMENT" name="comment" required='true' /><br />
+                <label for="pid">photo id:</label>
+                <input type="PID" name="pid" required='true' /><br />
+                <label for="date">date of comment (in form of YYYY-MM-DD):</label>
+                <input type="DATE" name="date" required='true' /><br />
+                <input type="submit" value="leave your comment" />
+            </form>
     {% endfor %}
     </ul>
 {% endif %}
@@ -25,19 +36,49 @@
   <p> Go to <a href='/profile'>profile?</a></p>
 {% endif %}
 
+
+{% if activities %}
+<h2>5 Most Active Users</h2>
+    <ul>
+    {% for activity in activities %}
+
+        <li>{{activity[0]}}<br>
+            {{activity[1]}}<br>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if contributors %}
+<h2>Users who left this comment</h2>
+    <ul>
+    {% for contributor in contributors %}
+
+        <li>{{contributor[0]}}<br>
+            {{contributor[1]}}<br>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
 {% if tags %}
-<h2>Most popular tags</h2>
+<h2>3 Most Popular Tags</h2>
     <ul>
     {% for tag in tags %}
-
-        <li>{{tag[0]}}<br>
+<form method="post" enctype="multipart/form-data" action="/viewall">
+        <li>
+        <input type="submit" name="tag" value={{tag[0]}}>
+        </li>
+</form>
     {% endfor %}
     </ul>
 {% endif %}
 
     <body>
         <div class="title">
-            <h1>View your photos by tags</h1>
+            <h1>View your photos by tags(Please enter a tag you've included in your photos uploaded)</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/viewy">
                 <label for="tag">tag name:</label>
@@ -56,6 +97,16 @@
             </form>
     </body>
 
+     <body>
+        <div class="title">
+            <h1>Search users by comments</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/searchcomment">
+                <label for="content">comment content:</label>
+                <input type="CONTENT" name="content" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>
 
 <ul>
     <li><a href='/addfriends'>Show and add friends</a></li>

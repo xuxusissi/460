@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ad151351-977a-4fcb-af43-8a76c8e8685b" name="Default" comment="" />
+    <list default="true" id="ad151351-977a-4fcb-af43-8a76c8e8685b" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.py" afterPath="$PROJECT_DIR$/app.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/schema.sql" afterPath="$PROJECT_DIR$/schema.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/create.html" afterPath="$PROJECT_DIR$/templates/create.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/friends.html" afterPath="$PROJECT_DIR$/templates/friends.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/hello.html" afterPath="$PROJECT_DIR$/templates/hello.html" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -10,10 +16,164 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/460$460.coverage" NAME="460 Coverage Results" MODIFIED="1508968979591" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/460$460.coverage" NAME="460 Coverage Results" MODIFIED="1508984929617" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="app.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="205">
+              <caret line="419" column="48" lean-forward="true" selection-start-line="419" selection-start-column="48" selection-end-line="419" selection-end-column="48" />
+              <folding>
+                <element signature="e#573#585#0" expanded="true" />
+                <marker date="1508984954000" expanded="true" signature="1342:1364" ph="SELECT EMAIL... USER" />
+                <marker date="1508984954000" expanded="true" signature="1461:1483" ph="SELECT EMAIL... USER" />
+                <marker date="1508984954000" expanded="true" signature="2039:2084" ph="SELECT PASSW... USER" />
+                <marker date="1508984954000" expanded="true" signature="2956:3001" ph="SELECT PASSW... USER" />
+                <marker date="1508984954000" expanded="true" signature="4669:4829" ph="INSERT INTO USER... " />
+                <marker date="1508984954000" expanded="true" signature="5347:5367" ph="SELECT UID F... USER" />
+                <marker date="1508984954000" expanded="true" signature="5476:5525" ph="SELECT DATA,... PHOTO" />
+                <marker date="1508984954000" expanded="true" signature="5721:5770" ph="SELECT DATA,... PHOTO" />
+                <marker date="1508984954000" expanded="true" signature="5882:5916" ph="SELECT PID F... PHOTO" />
+                <marker date="1508984954000" expanded="true" signature="6041:6084" ph="SELECT PID F... PHOTO" />
+                <marker date="1508984954000" expanded="true" signature="6203:6250" ph="SELECT PID F... ASSOCIATE" />
+                <marker date="1508984954000" expanded="true" signature="6396:6445" ph="SELECT DATA,... PHOTO" />
+                <marker date="1508984954000" expanded="true" signature="6565:6599" ph="SELECT AID F... ALBUM" />
+                <marker date="1508984954000" expanded="true" signature="6768:6808" ph="SELECT AID, ALBUM" />
+                <marker date="1508984954000" expanded="true" signature="6933:6987" ph="SELECT AID F... ALBUM" />
+                <marker date="1508984954000" expanded="true" signature="7028:7082" ph="SELECT AID F... ALBUM" />
+                <marker date="1508984954000" expanded="true" signature="7217:7257" ph="SELECT UID F... USER" />
+                <marker date="1508984954000" expanded="true" signature="7447:7489" ph="SELECT EMAIL... USER" />
+                <marker date="1508984954000" expanded="true" signature="7704:7745" ph="SELECT HASHT... TAG" />
+                <marker date="1508984954000" expanded="true" signature="7880:7902" ph="SELECT DATA PHOTO" />
+                <marker date="1508984954000" expanded="true" signature="8006:8012" ph="SELECT UID2 FRIENDSHIP" />
+                <marker date="1508984954000" expanded="true" signature="8006:8045" ph="SELECT FANAM... USER" />
+                <marker date="1508984954000" expanded="true" signature="8006:8048" ph="SELECT FANAM... USER" />
+                <marker date="1508984954000" expanded="true" signature="8013:8045" ph="SELECT UID2 FRIENDSHIP" />
+                <marker date="1508984954000" expanded="true" signature="8157:8237" ph="SELECT FNAME... UID" />
+                <marker date="1508984954000" expanded="true" signature="8194:8233" ph="SELECT UID2 FRIENDSHIP" />
+                <marker date="1508984954000" expanded="true" signature="8272:8352" ph="SELECT FNAME... UID" />
+                <marker date="1508984954000" expanded="true" signature="8309:8348" ph="SELECT UID2 FRIENDSHIP" />
+                <marker date="1508984954000" expanded="true" signature="9546:9612" ph="INSERT INTO PHOTO... " />
+                <marker date="1508984954000" expanded="true" signature="9685:9751" ph="INSERT INTO PHOTO... " />
+                <marker date="1508984954000" expanded="true" signature="9946:9986" ph="INSERT INTO TAG... " />
+                <marker date="1508984954000" expanded="true" signature="10139:10195" ph="INSERT INTO ASSOCIATE... " />
+                <marker date="1508984954000" expanded="true" signature="10371:10427" ph="INSERT INTO ASSOCIATE... " />
+                <marker date="1508984954000" expanded="true" signature="11144:11206" ph="INSERT INTO ALBUM... " />
+                <marker date="1508984954000" expanded="true" signature="11944:11989" ph="DELETE FROM " />
+                <marker date="1508984954000" expanded="true" signature="12766:12814" ph="DELETE FROM " />
+                <marker date="1508984954000" expanded="true" signature="14260:14313" ph="INSERT INTO FRIENDSHIP... " />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="view.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/view.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="unauth.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/unauth.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="register.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/register.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ee.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/ee.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-185">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="friends.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/templates/friends.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="271">
+              <caret line="21" column="60" lean-forward="true" selection-start-line="21" selection-start-column="60" selection-end-line="21" selection-end-column="60" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="schema.sql" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/schema.sql">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="188">
+              <caret line="92" column="94" lean-forward="true" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="94" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="create.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/create.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-80">
+              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="upload.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/upload.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hello.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/hello.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="361">
+              <caret line="50" column="46" lean-forward="true" selection-start-line="50" selection-start-column="46" selection-end-line="50" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/templates/create.html" />
+        <option value="$PROJECT_DIR$/schema.sql" />
+        <option value="$PROJECT_DIR$/app.py" />
+        <option value="$PROJECT_DIR$/templates/hello.html" />
+        <option value="$PROJECT_DIR$/templates/friends.html" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -114,12 +274,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="23" y="23" width="1264" height="699" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959083" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3294702" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3294702" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -145,5 +306,134 @@
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$USER_HOME$/anaconda/envs/python2/lib/python2.7/site-packages/pymysql/err.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1084">
+          <caret line="99" column="29" lean-forward="true" selection-start-line="99" selection-start-column="29" selection-end-line="99" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/register.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/ee.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-185">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schema.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="92" column="94" lean-forward="true" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="94" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/unauth.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/create.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-80">
+          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/view.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="419" column="48" lean-forward="true" selection-start-line="419" selection-start-column="48" selection-end-line="419" selection-end-column="48" />
+          <folding>
+            <element signature="e#573#585#0" expanded="true" />
+            <marker date="1508984954000" expanded="true" signature="1342:1364" ph="SELECT EMAIL... USER" />
+            <marker date="1508984954000" expanded="true" signature="1461:1483" ph="SELECT EMAIL... USER" />
+            <marker date="1508984954000" expanded="true" signature="2039:2084" ph="SELECT PASSW... USER" />
+            <marker date="1508984954000" expanded="true" signature="2956:3001" ph="SELECT PASSW... USER" />
+            <marker date="1508984954000" expanded="true" signature="4669:4829" ph="INSERT INTO USER... " />
+            <marker date="1508984954000" expanded="true" signature="5347:5367" ph="SELECT UID F... USER" />
+            <marker date="1508984954000" expanded="true" signature="5476:5525" ph="SELECT DATA,... PHOTO" />
+            <marker date="1508984954000" expanded="true" signature="5721:5770" ph="SELECT DATA,... PHOTO" />
+            <marker date="1508984954000" expanded="true" signature="5882:5916" ph="SELECT PID F... PHOTO" />
+            <marker date="1508984954000" expanded="true" signature="6041:6084" ph="SELECT PID F... PHOTO" />
+            <marker date="1508984954000" expanded="true" signature="6203:6250" ph="SELECT PID F... ASSOCIATE" />
+            <marker date="1508984954000" expanded="true" signature="6396:6445" ph="SELECT DATA,... PHOTO" />
+            <marker date="1508984954000" expanded="true" signature="6565:6599" ph="SELECT AID F... ALBUM" />
+            <marker date="1508984954000" expanded="true" signature="6768:6808" ph="SELECT AID, ALBUM" />
+            <marker date="1508984954000" expanded="true" signature="6933:6987" ph="SELECT AID F... ALBUM" />
+            <marker date="1508984954000" expanded="true" signature="7028:7082" ph="SELECT AID F... ALBUM" />
+            <marker date="1508984954000" expanded="true" signature="7217:7257" ph="SELECT UID F... USER" />
+            <marker date="1508984954000" expanded="true" signature="7447:7489" ph="SELECT EMAIL... USER" />
+            <marker date="1508984954000" expanded="true" signature="7704:7745" ph="SELECT HASHT... TAG" />
+            <marker date="1508984954000" expanded="true" signature="7880:7902" ph="SELECT DATA PHOTO" />
+            <marker date="1508984954000" expanded="true" signature="8006:8012" ph="SELECT UID2 FRIENDSHIP" />
+            <marker date="1508984954000" expanded="true" signature="8006:8045" ph="SELECT FANAM... USER" />
+            <marker date="1508984954000" expanded="true" signature="8006:8048" ph="SELECT FANAM... USER" />
+            <marker date="1508984954000" expanded="true" signature="8013:8045" ph="SELECT UID2 FRIENDSHIP" />
+            <marker date="1508984954000" expanded="true" signature="8157:8237" ph="SELECT FNAME... UID" />
+            <marker date="1508984954000" expanded="true" signature="8194:8233" ph="SELECT UID2 FRIENDSHIP" />
+            <marker date="1508984954000" expanded="true" signature="8272:8352" ph="SELECT FNAME... UID" />
+            <marker date="1508984954000" expanded="true" signature="8309:8348" ph="SELECT UID2 FRIENDSHIP" />
+            <marker date="1508984954000" expanded="true" signature="9546:9612" ph="INSERT INTO PHOTO... " />
+            <marker date="1508984954000" expanded="true" signature="9685:9751" ph="INSERT INTO PHOTO... " />
+            <marker date="1508984954000" expanded="true" signature="9946:9986" ph="INSERT INTO TAG... " />
+            <marker date="1508984954000" expanded="true" signature="10139:10195" ph="INSERT INTO ASSOCIATE... " />
+            <marker date="1508984954000" expanded="true" signature="10371:10427" ph="INSERT INTO ASSOCIATE... " />
+            <marker date="1508984954000" expanded="true" signature="11144:11206" ph="INSERT INTO ALBUM... " />
+            <marker date="1508984954000" expanded="true" signature="11944:11989" ph="DELETE FROM " />
+            <marker date="1508984954000" expanded="true" signature="12766:12814" ph="DELETE FROM " />
+            <marker date="1508984954000" expanded="true" signature="14260:14313" ph="INSERT INTO FRIENDSHIP... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/upload.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/hello.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="50" column="46" lean-forward="true" selection-start-line="50" selection-start-column="46" selection-end-line="50" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/friends.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="21" column="60" lean-forward="true" selection-start-line="21" selection-start-column="60" selection-end-line="21" selection-end-column="60" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>

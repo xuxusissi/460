@@ -92,3 +92,4 @@ CREATE TABLE ASSOCIATE(
 );
 INSERT INTO USER (email, password, FNAME, LNAME) VALUES ('test@bu.edu', 'test', 'test', 'BU');
 INSERT INTO USER (email, password, FNAME, LNAME) VALUES ('test1@bu.edu', 'test','user', 'sb');
+

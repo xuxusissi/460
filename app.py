@@ -245,8 +245,16 @@ def getAllPhoto():
     cursor.execute("SELECT DATA FROM PHOTO")
     return cursor.fetchall()
 
+def getAllFriendsID(uid):
+    cursor=conn.cursor()
+    cursor.execute("SELECT UID2 FROM FRIENDSHIP WHERE UID1={0}".format(uid))
+    return cursor.fetchall()
 
-
+def getAllFriendsName(uid):
+    cursor=conn.cursor()
+    print("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1={0})".format(uid))
+    cursor.execute("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1={0})".format(uid))
+    return cursor.fetchall()
 
 
 
@@ -255,7 +263,9 @@ def getAllPhoto():
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-    return render_template('hello.html', name=flask_login.current_user.id, message="Here's your profile")
+    uid=getUserIdFromEmail(flask_login.current_user.id)
+    return render_template('hello.html', name=flask_login.current_user.id, message="Here's your profile",
+                           photos=getAllPhoto())
 
 
 # begin photo uploading code
@@ -321,7 +331,7 @@ def creat_album():
             "INSERT INTO ALBUM (NAME, UID, DOC) VALUES ('{0}', {1}, '{2}' )".format(aname, uid, time))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Album Created!',
-                               photos=getAllPhoto())
+                               photos=getAllPhoto(), albums=getUsersAlbumName(uid))
     else:
         return render_template('create.html', name=flask_login.current_user.id,
                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
@@ -330,8 +340,8 @@ def creat_album():
 @flask_login.login_required
 def delete_album():
     if request.method == 'POST':
-        uid = getUserIdFromEmail(flask_login.current_user.id)
-        aname = request.form.get('Album_name')
+        uid=getUserIdFromEmail(flask_login.current_user.id)
+        aname = request.form.get('name')
         cursor = conn.cursor()
         cursor.execute(
             "DELETE FROM ALBUM WHERE (NAME) VALUES ('{0}')".format(aname))
@@ -340,12 +350,14 @@ def delete_album():
                                    photos=getAllPhoto())
     else:
         return render_template('create.html', name=flask_login.current_user.id,
-                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
+                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id))
+                               )
 
 @app.route('/deletephoto', methods=['GET', 'POST'])
 @flask_login.login_required
 def delete_photo():
     if request.method == 'POST':
+        uid=getUserIdFromEmail(flask_login.current_user.id)
         caption = request.form.get('caption')
         cursor = conn.cursor()
         pid = getPIDbycaption(caption)
@@ -394,15 +406,14 @@ def add_friends():
             cursor.execute(
                 "INSERT INTO FRIENDSHIP (UID1, UID2) VALUES ({0}, {1})".format(uid1, uid2))
             conn.commit()
-            return render_template('hello.html', name=flask_login.current_user.id, message='Friend added!',
-                                   photos=getAllPhoto())
+            return render_template('friends.html',friends=getAllFriendsName(uid1),message='Friends added!')
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
-        return render_template('friends.html')
+        return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
 # default page
 @app.route("/", methods=['GET'])
 def hello():
-    return render_template('hello.html', message='Welecome to Photoshare', photos = getAllPhoto())
+    return render_template('hello.html', message='Welcome to Photoshare', photos = getAllPhoto())
 
 
 if __name__ == "__main__":

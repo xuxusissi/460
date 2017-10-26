@@ -15,6 +15,7 @@
     {% endfor %}
     </ul>
 {% endif %}
+
     <body>
         <div class="title">
             <h1>Create an album for yourself</h1>
@@ -32,8 +33,8 @@
             <h1>Delete an album</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/deletealbum">
-                <label for="album_name">Name of the album:</label>
-                <input type="NAME" name="album_name" required='true' /><br />
+                <label for="name">Name of the album:</label>
+                <input type="text" name="name" required='true' /><br />
                 <input type="submit" value="Delete" />
             </form>
     </body>

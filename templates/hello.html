@@ -13,7 +13,7 @@
     <ul>
     {% for photo in photos %}
 
-        <li>{{photo[2]}}<br>
+        <li>{{photo[1]}}<br>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
     {% endfor %}
     </ul>
@@ -24,6 +24,7 @@
 {% else %}
   <p> Go to <a href='/profile'>profile?</a></p>
 {% endif %}
+
 
     <body>
         <div class="title">
@@ -46,7 +47,7 @@
             </form>
     </body>
 <ul>
-    <li><a href='/addfriends'>See your friend list or add friends</a></li>
+    <li><a href='/addfriends'>Show and add friends</a></li>
     <li><a href='/create'>Album edit</a> </li>
 <li><a href='/upload'>Photo edit</a> </li>
 <li><a href='/logout'>Logout</a></li>

@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!doctype html>
 
-</body>
-</html>
+<title>View all</title>
+
+
+{% if tag_photo_all %}
+<h2>Here's all the photos with the tag you entered</h2>
+     <ul>
+    {% for each in tag_photo_all %}
+
+        <li>{{each[1]}}<br>
+        <img src='data:image/png;base64, {{each[0]}}'/></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+

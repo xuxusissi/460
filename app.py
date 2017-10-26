@@ -188,7 +188,7 @@ def getPID(aid):
 def getPIDbycaption(caption):
     cursor = conn.cursor()
     cursor.execute("SELECT PID FROM PHOTO WHERE CAPTION = '{0}'".format(caption))
-    return cursor.fetchall()
+    return cursor.fetchall()[0][0]
 
 def getPIDByTags(tag):
     cursor = conn.cursor()
@@ -234,7 +234,7 @@ def isEmailUnique(email):
 
 def isTagUnique(tag):
     cursor = conn.cursor()
-    if cursor.execute("SELECT HASHTAG FROM TAG WHERE TAG = '{0}'".format(tag)):
+    if cursor.execute("SELECT HASHTAG FROM TAG WHERE HASHTAG = '{0}'".format(tag)):
         return False
     else:
         return True
@@ -242,18 +242,27 @@ def isTagUnique(tag):
 
 def getAllPhoto():
     cursor = conn.cursor()
-    cursor.execute("SELECT DATA FROM PHOTO")
+    cursor.execute("SELECT DATA,CAPTION FROM PHOTO")
     return cursor.fetchall()
 
-def getAllFriendsID(uid):
-    cursor=conn.cursor()
-    cursor.execute("SELECT UID2 FROM FRIENDSHIP WHERE UID1={0}".format(uid))
-    return cursor.fetchall()
+
 
 def getAllFriendsName(uid):
     cursor=conn.cursor()
     print("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1={0})".format(uid))
     cursor.execute("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1={0})".format(uid))
+    return cursor.fetchall()
+
+def getAllTagPhoto(tag):
+    cursor=conn.cursor()
+    print("SELECT DATA,CAPTION FROM PHOTO WHERE PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{0}')".format(tag))
+    cursor.execute("SELECT DATA,CAPTION FROM PHOTO WHERE PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{0}')".format(tag))
+
+    return cursor.fetchall()
+
+def mostTag():
+    cursor=conn.cursor()
+    cursor.execute("SELECT HASHTAG FROM ASSOCIATE GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
     return cursor.fetchall()
 
 
@@ -286,8 +295,8 @@ def upload_file():
         aid = getUsersAlbumsWithName(uid, name)
         imgfile = request.files['photo']
         caption = request.form.get('caption')
-        tags = request.form.get('tag')
-        tag_list = tags.split(' ')
+        tag = request.form.get('tag')
+        #tag_list = tags.split(' ')
         print(caption)
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
@@ -295,22 +304,22 @@ def upload_file():
         cursor.execute(
             "INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
         conn.commit()
-        for i in range(0,len(tag_list)-1):
-            if isTagUnique(tag_list[i]):
-                cursor.execute(
-                    "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag_list[i]))
-                conn.commit()
-                pid = getPIDbycaption(caption)
-                cursor.execute(
-                    "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag_list[i], pid))
-                conn.commit()
-            else:
-                pid = getPIDbycaption(caption)
-                cursor.execute(
-                    "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag_list[i], pid))
-                conn.commit()
+        #for i in range(0,len(tag_list)-1):
+        if isTagUnique(tag):
+            cursor.execute(
+                "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag))
+            conn.commit()
+            pid = getPIDbycaption(caption)
+            cursor.execute(
+                "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
+            conn.commit()
+        else:
+            pid = getPIDbycaption(caption)
+            cursor.execute(
+                "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
+            conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!',
-                             photos=getAllPhoto())
+                             photos=getAllPhoto(),tags=mostTag())
         # The method is GET so we return a  HTML form to upload the a photo.
     else:
         return render_template('upload.html')
@@ -331,7 +340,7 @@ def creat_album():
             "INSERT INTO ALBUM (NAME, UID, DOC) VALUES ('{0}', {1}, '{2}' )".format(aname, uid, time))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Album Created!',
-                               photos=getAllPhoto(), albums=getUsersAlbumName(uid))
+                               photos=getAllPhoto(), albums=getUsersAlbumName(uid), tags=mostTag())
     else:
         return render_template('create.html', name=flask_login.current_user.id,
                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
@@ -347,7 +356,7 @@ def delete_album():
             "DELETE FROM ALBUM WHERE (NAME) VALUES ('{0}')".format(aname))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Album Deleted!',
-                                   photos=getAllPhoto())
+                                   photos=getAllPhoto(),tags=mostTag())
     else:
         return render_template('create.html', name=flask_login.current_user.id,
                                 albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id))
@@ -362,10 +371,10 @@ def delete_photo():
         cursor = conn.cursor()
         pid = getPIDbycaption(caption)
         cursor.execute(
-            "DELETE FROM PHOTO WHERE (CAPTION) VALUES ('{0}')".format(caption))
+            "DELETE FROM PHOTO WHERE CAPTION='{0}'".format(caption))
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted!',
-                                   photos=getAllPhoto())
+                                   photos=getAllPhoto(),tags=mostTag())
     else:
         return render_template('upload.html')
 
@@ -377,15 +386,13 @@ def view_your_photo():
     tags = request.form.get('tag')
     list_tag = tags.split(' ')
     return render_template('hello.html', name=flask_login.current_user.id, message='Photo searched!',
-                               photos=getAllPhoto())
+                               photos=getAllPhoto(),tags=mostTag())
 
 
 @app.route('/viewall', methods=['POST'])
 def view_all_photo():
-    tags = request.form.get('tag')
-    list_tag = tags.split(' ')
-    return render_template('hello.html', name=flask_login.current_user.id, message='Photo searched!',
-                            photos=getAllPhoto())
+    tag = request.form.get('tag')
+    return render_template('view.html', tag_photo_all=getAllTagPhoto(tag))
 
 
 
@@ -413,7 +420,7 @@ def add_friends():
 # default page
 @app.route("/", methods=['GET'])
 def hello():
-    return render_template('hello.html', message='Welcome to Photoshare', photos = getAllPhoto())
+    return render_template('hello.html', message='Welcome to Photoshare!', photos = getAllPhoto(),tags=mostTag())
 
 
 if __name__ == "__main__":

@@ -244,7 +244,7 @@ def isTagUnique(tag):
 
 def getAllPhoto():
     cursor = conn.cursor()
-    cursor.execute("SELECT DATA,CAPTION,PID FROM PHOTO")
+    cursor.execute("SELECT P.DATA,P.CAPTION,P.PID,COUNT(L.DOC) FROM PHOTO P LEFT OUTER JOIN LIKETABLE L ON P.PID=L.PID GROUP BY P.PID")
     return cursor.fetchall()
 
 
@@ -506,8 +506,16 @@ def search_comment():
     else:
         return render_template("hello.html",message="users found!",contributors=user_by_comment(content))
 
-
-
+@app.route('/like', methods=['POST'])
+@flask_login.login_required
+def likephoto():
+    uid=getUserIdFromEmail(flask_login.current_user.id)
+    pid=request.form.get('pid')
+    doc=request.form.get('date')
+    cursor=conn.cursor()
+    cursor.execute("INSERT INTO LIKETABLE(UID,PID,DOC) VALUES({0},{1},'{2}')".format(uid,pid,doc))
+    conn.commit()
+    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
 
 
 

@@ -12,20 +12,29 @@
 <h2>Here're all photos</h2>
     <ul>
     {% for photo in photos %}
-
-        <li>Photo ID:{{photo[2]}}<br>
-            Photo caption:{{photo[1]}}<br>
-        </li>>
+        <li>Photo ID: {{photo[2]}}<br>
+            Photo caption: {{photo[1]}}<br>
+            Number of LIKEs: {{ photo[3] }}
+        </li>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
+
+        <form method="post" enctype="multipart/form-data" action="/like">
+                <label for="pid">photo id you want to like:</label>
+                <input type="PID" name="pid" required='true' /><br />
+                <label for="date">date of like (in form of YYYY-MM-DD):</label>
+                <input type="DATE" name="date" required='true' /><br />
+                <input type="submit" value="LIKE" />
+        </form>
+
         <form method="post" enctype="multipart/form-data" action="/comment">
-                <label for="comment">leave your comment:</label>
+                <label for="comment">comment:</label>
                 <input type="COMMENT" name="comment" required='true' /><br />
-                <label for="pid">photo id:</label>
+                <label for="pid">photo id you want to comment on:</label>
                 <input type="PID" name="pid" required='true' /><br />
                 <label for="date">date of comment (in form of YYYY-MM-DD):</label>
                 <input type="DATE" name="date" required='true' /><br />
-                <input type="submit" value="leave your comment" />
-            </form>
+                <input type="submit" value="LEAVE YOUR COMMENT" />
+        </form>
     {% endfor %}
     </ul>
 {% endif %}
@@ -42,8 +51,7 @@
     <ul>
     {% for activity in activities %}
 
-        <li>{{activity[0]}}<br>
-            {{activity[1]}}<br>
+        <li>{{activity[0]}} {{activity[1]}}<br>
         </li>
     {% endfor %}
     </ul>
@@ -55,8 +63,7 @@
     <ul>
     {% for contributor in contributors %}
 
-        <li>{{contributor[0]}}<br>
-            {{contributor[1]}}<br>
+        <li>{{contributor[0]}} {{contributor[1]}}<br>
         </li>
     {% endfor %}
     </ul>
@@ -67,11 +74,11 @@
 <h2>3 Most Popular Tags</h2>
     <ul>
     {% for tag in tags %}
-<form method="post" enctype="multipart/form-data" action="/viewall">
-        <li>
-        <input type="submit" name="tag" value={{tag[0]}}>
-        </li>
-</form>
+        <form method="post" enctype="multipart/form-data" action="/viewall">
+            <li>
+            <input type="submit" name="tag" value={{tag[0]}}>
+            </li>
+        </form>
     {% endfor %}
     </ul>
 {% endif %}

@@ -352,7 +352,7 @@ def upload_file():
             "INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
         cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
         conn.commit()
-        for i in range(0,len(tag_list)-1):
+        for i in range(0,len(tag_list)):
             if isTagUnique(tag_list[i]):
                 cursor.execute(
                     "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag_list[i]))

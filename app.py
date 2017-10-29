@@ -300,7 +300,7 @@ def selfComment(uid,pid):
 
 def activeUsers():
     cursor=conn.cursor()
-    cursor.execute("SELECT FNAME,LNAME FROM USER ORDER BY CONTRIBUTION DESC LIMIT 5")
+    cursor.execute("SELECT FNAME,LNAME FROM USER ORDER BY CONTRIBUTION DESC LIMIT 10")
     return cursor.fetchall()
 
 def isCommentUnique(comment):
@@ -467,7 +467,7 @@ def add_friends():
             return render_template('friends.html',friends=getAllFriendsName(uid1),message='Friends added!')
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
-        return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)), message='idk')
+        return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
 # default page
 
 @app.route('/comment', methods=['POST'])

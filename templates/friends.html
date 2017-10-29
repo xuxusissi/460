@@ -2,21 +2,21 @@
 <head>
     <title>Friends</title>
 </head>
-{% if friendship %}
+
+{% if friends %}
 <h2>Here's your friends</h2>
     <ul>
-    {% for friend in friendship %}
+    {% for friend in friends %}
 
-        <li>{{album[1]}}<br>
+        <li>{{friend[0]}}<br>
         </li>
     {% endfor %}
     </ul>
 {% endif %}
 
-
     <body>
         <div class="title">
-            <h1>Add friends!</h1>
+            <h1>Add friends</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/addfriends">
                 <label for="email">Enter user email:</label>

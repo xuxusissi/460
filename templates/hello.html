@@ -9,12 +9,32 @@
 {% endif %}
 
 {% if photos %}
-<h2>Here's your photos</h2>
+<h2>Here're all photos</h2>
     <ul>
     {% for photo in photos %}
-
-        <li>{{photo[2]}}<br>
+        <li>Photo ID: {{photo[2]}}<br>
+            Photo caption: {{photo[1]}}<br>
+            Number of LIKEs: {{ photo[3] }}
+        </li>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
+
+        <form method="post" enctype="multipart/form-data" action="/like">
+                <label for="pid">photo id you want to like:</label>
+                <input type="PID" name="pid" required='true' /><br />
+                <label for="date">date of like (in form of YYYY-MM-DD):</label>
+                <input type="DATE" name="date" required='true' /><br />
+                <input type="submit" value="LIKE" />
+        </form>
+
+        <form method="post" enctype="multipart/form-data" action="/comment">
+                <label for="comment">comment:</label>
+                <input type="COMMENT" name="comment" required='true' /><br />
+                <label for="pid">photo id you want to comment on:</label>
+                <input type="PID" name="pid" required='true' /><br />
+                <label for="date">date of comment (in form of YYYY-MM-DD):</label>
+                <input type="DATE" name="date" required='true' /><br />
+                <input type="submit" value="LEAVE YOUR COMMENT" />
+        </form>
     {% endfor %}
     </ul>
 {% endif %}
@@ -25,9 +45,47 @@
   <p> Go to <a href='/profile'>profile?</a></p>
 {% endif %}
 
+
+{% if activities %}
+<h2>5 Most Active Users</h2>
+    <ul>
+    {% for activity in activities %}
+
+        <li>{{activity[0]}} {{activity[1]}}<br>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if contributors %}
+<h2>Users who left this comment</h2>
+    <ul>
+    {% for contributor in contributors %}
+
+        <li>{{contributor[0]}} {{contributor[1]}}<br>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if tags %}
+<h2>3 Most Popular Tags</h2>
+    <ul>
+    {% for tag in tags %}
+        <form method="post" enctype="multipart/form-data" action="/viewall">
+            <li>
+            <input type="submit" name="tag" value={{tag[0]}}>
+            </li>
+        </form>
+    {% endfor %}
+    </ul>
+{% endif %}
+
     <body>
         <div class="title">
-            <h1>View your photos by tags</h1>
+            <h1>View your photos by tags(Please enter a tag you've included in your photos uploaded)</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/viewy">
                 <label for="tag">tag name:</label>
@@ -45,8 +103,20 @@
                 <input type="submit" value="Search" />
             </form>
     </body>
+
+     <body>
+        <div class="title">
+            <h1>Search users by comments</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/searchcomment">
+                <label for="content">comment content:</label>
+                <input type="CONTENT" name="content" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>
+
 <ul>
-    <li><a href='/addfriends'>See your friend list or add friends</a></li>
+    <li><a href='/addfriends'>Show and add friends</a></li>
     <li><a href='/create'>Album edit</a> </li>
 <li><a href='/upload'>Photo edit</a> </li>
 <li><a href='/logout'>Logout</a></li>

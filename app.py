@@ -383,6 +383,7 @@ def creat_album():
         uid = getUserIdFromEmail(flask_login.current_user.id)
         aname = request.form.get('name')
         time = request.form.get('time')
+
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO ALBUM (NAME, UID, DOC) VALUES ('{0}', {1}, '{2}' )".format(aname, uid, time))
@@ -401,9 +402,9 @@ def delete_album():
         aname = request.form.get('name')
         cursor = conn.cursor()
         cursor.execute(
-            "DELETE FROM ALBUM WHERE (NAME) VALUES ('{0}')".format(aname))
+            "DELETE FROM ALBUM WHERE NAME = '{0}' AND UID = {1}".format(aname, uid))
         conn.commit()
-        return render_template('hello.html', name=flask_login.current_user.id, message='Album Deleted!',
+        return render_template('hello.html', name=flask_login.current_user.id, message='Album Deleted if you are the owner of the album!',
                                    photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
     else:
         return render_template('create.html', name=flask_login.current_user.id,
@@ -419,9 +420,9 @@ def delete_photo():
         cursor = conn.cursor()
         pid = getPIDbycaption(caption)
         cursor.execute(
-            "DELETE FROM PHOTO WHERE CAPTION='{0}'".format(caption))
+            "DELETE FROM PHOTO WHERE CAPTION='{0}' AND AID IN (SELECT AID FROM ALBUM WHERE UID = {1})".format(caption, uid))
         conn.commit()
-        return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted!',
+        return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted if you are the owner of the photo!',
                                    photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
     else:
         return render_template('upload.html')

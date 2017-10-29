@@ -267,7 +267,7 @@ def getAllTagsPhoto(tags):
 
 def mostTag():
     cursor=conn.cursor()
-    cursor.execute("SELECT HASHTAG FROM ASSOCIATE GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
+    cursor.execute("SELECT HASHTAG FROM TAG GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
     return cursor.fetchall()
 
 def getYourTagPhoto(tag,uid):
@@ -343,8 +343,8 @@ def upload_file():
         imgfile = request.files['photo']
         caption = request.form.get('caption')
         tag = request.form.get('tag')
-        #tag_list = tags.split(' ')
-        print(caption)
+        tag_list = tag.split(' ')
+        print(tag_list)
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
         print("INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
@@ -352,20 +352,20 @@ def upload_file():
             "INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
         cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
         conn.commit()
-        #for i in range(0,len(tag_list)-1):
-        if isTagUnique(tag):
-            cursor.execute(
-                "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag))
-            conn.commit()
-            pid = getPIDbycaption(caption)
-            cursor.execute(
-                "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
-            conn.commit()
-        else:
-            pid = getPIDbycaption(caption)
-            cursor.execute(
-                "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
-            conn.commit()
+        for i in range(0,len(tag_list)-1):
+            if isTagUnique(tag_list[i]):
+                cursor.execute(
+                    "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag_list[i]))
+                conn.commit()
+                pid = getPIDbycaption(caption)
+                cursor.execute(
+                    "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag_list[i], pid))
+                conn.commit()
+            else:
+                pid = getPIDbycaption(caption)
+                cursor.execute(
+                    "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag_list[i], pid))
+                conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!',
                              photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
         # The method is GET so we return a  HTML form to upload the a photo.

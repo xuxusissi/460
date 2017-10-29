@@ -3,6 +3,10 @@
     <title>Friends</title>
 </head>
 
+{% if message %}
+    <h4>{{ message }}</h4>
+{% endif %}
+
 {% if friends %}
 <h2>Here's your friends</h2>
     <ul>

@@ -159,10 +159,7 @@ def register_user():
         return render_template('hello.html', name=email, message='Account Created!')
     else:
         print("couldn't find all tokens")
-        return flask.redirect(flask.url_for('register'),message="already exists")
-
-
-
+        return render_template('register.html', message='Already Exists!')
 
 
 
@@ -458,8 +455,8 @@ def add_friends():
     if request.method == 'POST':
         email = request.form.get('email')
         if isEmailUnique(email):
-            return render_template('hello.html', name=flask_login.current_user.id, message='Friend does not exist!',
-                                  photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+            uid1 = getUserIdFromEmail(flask_login.current_user.id)
+            return render_template('friends.html',friends=getAllFriendsName(uid1), message = 'User does not exist.')
         else:
             uid2 = getUserIdFromEmail(email)
             uid1 = getUserIdFromEmail(flask_login.current_user.id)
@@ -470,7 +467,7 @@ def add_friends():
             return render_template('friends.html',friends=getAllFriendsName(uid1),message='Friends added!')
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
-        return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
+        return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)), message='idk')
 # default page
 
 @app.route('/comment', methods=['POST'])

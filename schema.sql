@@ -90,5 +90,5 @@ CREATE TABLE ASSOCIATE(
 	FOREIGN KEY (PID) REFERENCES PHOTO(PID) ON DELETE CASCADE
 );
 INSERT INTO USER (email, password, FNAME, LNAME) VALUES ('test@bu.edu', 'test', 'test', 'BU');
-INSERT INTO USER (email, password, FNAME, LNAME) VALUES ('test1@bu.edu', 'test','user', 'sb');
+INSERT INTO USER (email, password, FNAME, LNAME) VALUES ('test1@bu.edu', 'test','user', 'name');
 

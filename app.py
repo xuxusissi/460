@@ -472,7 +472,7 @@ def add_friends():
 # default page
 
 @app.route('/comment', methods=['POST'])
-@flask_login.login_required
+#@flask_login.login_required
 def add_comment():
     pid=request.form.get('pid')
     content=request.form.get('comment')
@@ -481,9 +481,17 @@ def add_comment():
         print("not logged in")
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0,pid,date,content))
+            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0, pid, date, content))
         conn.commit()
-        return render_template('hello.html',message='Your comment is added anonymously!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+        return render_template('hello.html', message='Your comment is added anonymously!', photos=getAllPhoto(), tags=mostTag(), activities=activeUsers())
+
+    if session.get('logged_in'):
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(uid,pid,date,content))
+        conn.commit()
+        return render_template('hello.html',message='Your comment is added!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
     else:
         uid = getUserIdFromEmail(flask_login.current_user.id)
         if selfComment(uid,pid):
@@ -500,7 +508,7 @@ def add_comment():
 def search_comment():
     content=request.form.get('content')
     if isCommentUnique(content):
-        return render_template("hello.html",message="comments don not exist")
+        return render_template("hello.html",message="comments do not exist")
     else:
         return render_template("hello.html",message="users found!",contributors=user_by_comment(content))
 

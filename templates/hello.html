@@ -89,7 +89,7 @@
 
     <body>
         <div class="title">
-            <h1>View your photos by tags(Please enter a tag you've included in your photos uploaded)</h1>
+            <h1>View your photos by a certain tag(Please enter a tag you've included in your photos uploaded)</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/viewy">
                 <label for="tag">tag name:</label>
@@ -99,7 +99,7 @@
     </body>
     <body>
         <div class="title">
-            <h1>Search for all photos by tags</h1>
+            <h1>Search for all photos by a certain tag</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/viewall">
                 <label for="tag">tag name:</label>
@@ -107,17 +107,16 @@
                 <input type="submit" value="Search" />
             </form>
     </body>
-{#    <body>#}
-{#        <div class="title">#}
-{#            <h1>Photo search (multiple tags)</h1>#}
-{#        </div>#}
-{#            <form method="post" enctype="multipart/form-data" action="/viewall">#}
-{#                <label for="tag">tag name:</label>#}
-{#                <input type="text" name="tag" required='true' /><br />#}
-{#                <input type="submit" value="Search" />#}
-{#            </form>#}
-{#    </body>#}
-
+    <body>
+        <div class="title">
+            <h1>Photo search by multiple tags</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/searchtags">
+                <label for="tag">tag name:</label>
+                <input type="text" name="tag" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>
      <body>
         <div class="title">
             <h1>Search users by comments</h1>

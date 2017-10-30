@@ -1,0 +1,17 @@
+<!doctype html>
+
+<title>Search photos by tags</title>
+
+
+{% if listphotos %}
+<h2>Here's all the photos with the tags you entered</h2>
+     <ul>
+    {% for each in listphotos %}
+
+        <li>{{each[1]}}<br>
+        <img src='data:image/png;base64, {{each[0]}}'/></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<a href='/'>Home</a>

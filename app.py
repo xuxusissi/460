@@ -456,6 +456,24 @@ def view_all_photo():
     else:
         return render_template('viewall.html', tag_photo_all=getAllTagPhoto(tag))
 
+@app.route('/searchtags', methods=['GET','POST'])
+def search_by_tags():
+    if request.method=='POST':
+        tag = request.form.get('tag')
+        tag = tag.split(" ")
+        print(tag)
+        list_photos = []
+        for t in tag:
+            if isTagUnique(t):
+                list_photos += getPhotosByTags(t)
+        print(list_photos)
+        if list_photos != []:
+            return render_template("searchtags.html", message="Here are all photos with tags", listphotos=list_photos)
+        else:
+            return render_template("hello.html", name=flask_login.current_user.id, message='No photo with this tag!',
+                                      photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+    else:
+        return render_template("hello.html", name=flask_login.current_user.id, photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
 
 
 
@@ -502,7 +520,6 @@ def add_comment():
             return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
                                    name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
     else:
-    #if not session.get('logged_in'):
         print("not logged in")
         cursor = conn.cursor()
         cursor.execute(

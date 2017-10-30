@@ -237,7 +237,12 @@ def isTagUnique(tag):
         return False
     else:
         return True
-
+def isTagExist(tag):
+    cursor = conn.cursor()
+    if cursor.execute("SELECT HASHTAG FROM TAG WHERE HASHTAG = '{0}'".format(tag)):
+        return True
+    else:
+        return False
 
 def getAllPhoto():
     cursor = conn.cursor()
@@ -357,9 +362,9 @@ def upload_file():
         print(tag_list)
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
-        print("INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
+        print("INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}'} )".format(photo_data, aid, caption, uid))
         cursor.execute(
-            "INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
+            "INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}')".format(photo_data, aid, caption, uid))
         cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
         conn.commit()
         for i in range(0,len(tag_list)):
@@ -464,16 +469,16 @@ def search_by_tags():
         print(tag)
         list_photos = []
         for t in tag:
-            if isTagUnique(t):
+            if isTagExist(t):
                 list_photos += getPhotosByTags(t)
         print(list_photos)
         if list_photos != []:
             return render_template("searchtags.html", message="Here are all photos with tags", listphotos=list_photos)
         else:
-            return render_template("hello.html", name=flask_login.current_user.id, message='No photo with this tag!',
+            return render_template("hello.html", message='No photo with this tag!',
                                       photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
     else:
-        return render_template("hello.html", name=flask_login.current_user.id, photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+        return render_template("hello.html", photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
 
 
 

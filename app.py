@@ -501,8 +501,8 @@ def add_comment():
             conn.commit()
             return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
                                    name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
-
-    if not session.get('logged_in'):
+    else:
+    #if not session.get('logged_in'):
         print("not logged in")
         cursor = conn.cursor()
         cursor.execute(

@@ -11,11 +11,16 @@
 {% if photos%}
 <h2>Here're all photos</h2>
     <ul>
+
     {% for photo in photos %}
         <li>Photo ID: {{photo[2]}}<br>
             Photo caption: {{photo[1]}}<br>
             Number of LIKEs: {{ photo[3] }}<br>
- //           Users who liked this photo:{{ulike}}<br>
+        {% if ulikes %}
+            {% for ulike in ulikes%}
+                Users who liked this photo:{{ulike}}<br>
+            {% endfor %}
+        {% endif %}
         </li>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
 

@@ -244,9 +244,10 @@ def getAllPhoto():
     cursor.execute("SELECT P.DATA,P.CAPTION,P.PID,COUNT(L.DOC) FROM PHOTO P LEFT OUTER JOIN LIKETABLE L ON P.PID=L.PID GROUP BY P.PID")
     return cursor.fetchall()
 
-def getUserLike():
+def getUserLike(pid):
     cursor = conn.cursor()
-    cursor.execute("SELECT UID FROM LIKETABLE GROUP BY UID;")
+    print("SELECT DISTINCT L.UID FROM LIKETABLE L WHERE L.PID = {0}".format(pid))
+    cursor.execute("SELECT DISTINCT L.UID FROM LIKETABLE L WHERE L.PID = {0} ".format(pid))
     return cursor.fetchall()
 
 def getAllFriendsName(uid):
@@ -478,6 +479,8 @@ def add_friends():
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
         return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
+
+
 # default page
 
 @app.route('/comment', methods=['POST'])
@@ -524,11 +527,11 @@ def likephoto():
     uid=getUserIdFromEmail(flask_login.current_user.id)
     pid=request.form.get('pid')
     doc=request.form.get('date')
-    userlike = getUserLike()
     cursor=conn.cursor()
+    print(uid)
     cursor.execute("INSERT INTO LIKETABLE(UID,PID,DOC) VALUES({0},{1},'{2}')".format(uid,pid,doc))
     conn.commit()
-    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(), ulike = userlike, name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(), ulikes=getUserLike(pid), name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
 
 
 

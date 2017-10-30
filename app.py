@@ -273,6 +273,12 @@ def mostTag():
     cursor.execute("SELECT HASHTAG FROM TAG GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
     return cursor.fetchall()
 
+def getPhotowithMostTag(): # need to be modified
+    cursor = conn.cursor()
+    most = mostTag() #list
+    cursor.execute("SELECT PID FROM ASSOCIATE WHERE HASHTAG IN most") # a string = list
+    return cursor.fetchall()
+
 def getYourTagPhoto(tag,uid):
     cursor=conn.cursor()
     print("SELECT P.CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID={0} AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
@@ -479,14 +485,6 @@ def add_comment():
     pid=request.form.get('pid')
     content=request.form.get('comment')
     date=request.form.get('date')
-    if not session.get('logged_in'):
-        print("not logged in")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0, pid, date, content))
-        conn.commit()
-        return render_template('hello.html', message='Your comment is added anonymously!', photos=getAllPhoto(), tags=mostTag(), activities=activeUsers())
-
     if session.get('logged_in'):
         uid = getUserIdFromEmail(flask_login.current_user.id)
         if selfComment(uid,pid):
@@ -500,6 +498,16 @@ def add_comment():
             conn.commit()
             return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
                                    name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
+
+    if not session.get('logged_in'):
+        print("not logged in")
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0, pid, date, content))
+        conn.commit()
+        return render_template('hello.html', message='Your comment is added anonymously!', photos=getAllPhoto(), tags=mostTag(), activities=activeUsers())
+
+
 
 @app.route('/searchcomment', methods=['POST'])
 @flask_login.login_required

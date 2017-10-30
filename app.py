@@ -148,8 +148,8 @@ def register_user():
     cursor = conn.cursor()
     test = isEmailUnique(email)
     if test:
-        print(cursor.execute("INSERT INTO USER (EMAIL, PASSWORD, FNAME, LNAME, DOB, HOMETOWN, GENDER) "
-                             "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".
+        print(cursor.execute("INSERT INTO USER (EMAIL, PASSWORD, FNAME, LNAME, DOB, HOMETOWN, GENDER, CONTRIBUTION) "
+                             "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', 0)".
                              format(email, password, first_name, last_name, dob, hometown, gender)))
         conn.commit()
         # log user in
@@ -244,7 +244,10 @@ def getAllPhoto():
     cursor.execute("SELECT P.DATA,P.CAPTION,P.PID,COUNT(L.DOC) FROM PHOTO P LEFT OUTER JOIN LIKETABLE L ON P.PID=L.PID GROUP BY P.PID")
     return cursor.fetchall()
 
-
+def getUserLike():
+    cursor = conn.cursor()
+    cursor.execute("SELECT UID FROM LIKETABLE GROUP BY UID;")
+    return cursor.fetchall()
 
 def getAllFriendsName(uid):
     cursor=conn.cursor()
@@ -472,7 +475,6 @@ def add_friends():
 # default page
 
 @app.route('/comment', methods=['POST'])
-#@flask_login.login_required
 def add_comment():
     pid=request.form.get('pid')
     content=request.form.get('comment')
@@ -487,21 +489,17 @@ def add_comment():
 
     if session.get('logged_in'):
         uid = getUserIdFromEmail(flask_login.current_user.id)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(uid,pid,date,content))
-        conn.commit()
-        return render_template('hello.html',message='Your comment is added!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
-    else:
-        uid = getUserIdFromEmail(flask_login.current_user.id)
         if selfComment(uid,pid):
             return render_template('hello.html',message='you cannot leave comments to your own photo',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
         else:
-            cursor=conn.cursor()
-            cursor.execute("INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES({0},{1},'{2}','{3}')".format(uid,pid,date,content))
+            uid = getUserIdFromEmail(flask_login.current_user.id)
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES({0},{1},'{2}','{3}')".format(uid, pid, date, content))
             cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
             conn.commit()
-            return render_template('hello.html',message='Your comment is added!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+            return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
+                                   name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
 
 @app.route('/searchcomment', methods=['POST'])
 @flask_login.login_required
@@ -518,10 +516,11 @@ def likephoto():
     uid=getUserIdFromEmail(flask_login.current_user.id)
     pid=request.form.get('pid')
     doc=request.form.get('date')
+    userlike = getUserLike()
     cursor=conn.cursor()
     cursor.execute("INSERT INTO LIKETABLE(UID,PID,DOC) VALUES({0},{1},'{2}')".format(uid,pid,doc))
     conn.commit()
-    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(), ulike = userlike, name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
 
 
 

@@ -16,11 +16,9 @@
         <li>Photo ID: {{photo[2]}}<br>
             Photo caption: {{photo[1]}}<br>
             Number of LIKEs: {{ photo[3] }}<br>
-        {% if ulikes %}
-            {% for ulike in ulikes%}
-                Users who liked this photo:{{ulike}}<br>
-            {% endfor %}
-        {% endif %}
+        {% for ulike in ulikes%}
+            Users who liked this photo:{{ulike}}<br>
+        {% endfor %}
         </li>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
 
@@ -37,8 +35,8 @@
                 <input type="COMMENT" name="comment" required='true' /><br />
                 <label for="pid">photo id you want to comment on:</label>
                 <input type="PID" name="pid" required='true' /><br />
-                <label for="date">date of comment (in form of YYYY-MM-DD):</label>
-                <input type="DATE" name="date" required='true' /><br />
+                <label for="date">date of comment:</label>
+                <input type="DATE" name="date" required='true' placeholder = "YYYY-MM-DD"/><br />
                 <input type="submit" value="LEAVE YOUR COMMENT" />
         </form>
     {% endfor %}

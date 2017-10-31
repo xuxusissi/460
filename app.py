@@ -287,9 +287,25 @@ def mostTag():
 
 def FiveTopfromUser(uid):
     cursor=conn.cursor()
-    print("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND P.UID = '{0}' GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
-    cursor.execute("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND P.UID = '{0}' GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    print("SELECT A.HASHTAG, COUNT(HASHTAG) FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND P.UID = '{0}' GROUP BY A.HASHTAG".format(uid))
+    cursor.execute("SELECT A.HASHTAG, COUNT(HASHTAG) FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND P.UID = '{0}' GROUP BY A.HASHTAG".format(uid))
     return cursor.fetchall()
+def getKey(a):
+    a[1]
+def FiveTopTag(uid):
+    list = FiveTopfromUser(uid)
+    fivetoplist = []
+    TagOrdered = sorted(list, key = getKey, reverse=True)
+    if len(TagOrdered) <=5:
+        for i in TagOrdered:
+            fivetoplist.append(i[0])
+        return fivetoplist
+    else:
+        list_result = TagOrdered[0:5]
+        for i in list_result:
+            fivetoplist.append(i[0])
+        return fivetoplist
+
 def OneDiffTag(Tag1):
     cursor=conn.cursor()
     print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN '{0}'".format(Tag1))
@@ -302,8 +318,7 @@ def TwoDiffTags(Tag1, Tag2):
     return cursor.fetchall()
 def ThreeDiffTags(Tag1, Tag2, Tag3):
     cursor = conn.cursor()
-    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
-            Tag1, Tag2, Tag3))
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(Tag1, Tag2, Tag3))
     cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
             Tag1, Tag2, Tag3))
     return cursor.fetchall()
@@ -331,7 +346,8 @@ def NumTagsFromPID(pid):
 
 def FindPhotosWithSameTag(uid, tag):
     cursor=conn.cursor()
-    cursor.execute("SELECT * FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND P.UID!='{0}' AND A.HASHTAG ='{1}'".format(uid, tag))
+    print("SELECT * FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND P.UID!='{0}' AND A.HASHTAG ={1}".format(uid,tag))
+    cursor.execute("SELECT * FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND P.UID!='{0}' AND A.HASHTAG ='{1}'".format(uid,tag))
     return cursor.fetchall()
 
 def getPhotowithMostTag(): # need to be modified
@@ -340,7 +356,7 @@ def getPhotowithMostTag(): # need to be modified
     cursor.execute("SELECT PID FROM ASSOCIATE WHERE HASHTAG IN most") # a string = list
     return cursor.fetchall()
 
-def getYourTagPhoto(tag,uid):
+def getYourTagPhoto(uid,tag):
     cursor=conn.cursor()
     print("SELECT P.CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID='{0}' AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
     cursor.execute("SELECT DATA,CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID='{0}' AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
@@ -506,7 +522,7 @@ def delete_album():
 def view_your_photo():
     tag = request.form.get('tag')
     uid=getUserIdFromEmail(flask_login.current_user.id)
-    return render_template('viewyour.html', tag_photo_your=getYourTagPhoto(tag,uid))
+    return render_template('viewyour.html', tag_photo_your=getYourTagPhoto(uid,tag))
 
 # end view your photo code
 
@@ -654,14 +670,15 @@ def YouMayAlsoLike():
 
 def YouMayAlsoLikeList():
     uid=getUserIdFromEmail(flask_login.current_user.id)
-    FiveTop = FiveTopfromUser(uid)
+    FiveTop = FiveTopTag(uid)
     list = []
     if len(FiveTop) < 1:
+        print(list)
         return list
     num = 0
     for a in FiveTop:
-        if FindPhotosWithSameTag(a, uid):
-            num +=1
+        if FindPhotosWithSameTag(uid, a[0]):
+            num += 1
     if num == 0:
         return list
     else:
@@ -672,7 +689,7 @@ def YouMayAlsoLikeList():
                 if i == len(list_tag) - 1:
                     list.append(list_tag[i][0])
                 else:
-                    if list_tag[i][1] -- list_tag[i+1][1]:
+                    if list_tag[i][1] == list_tag[i+1][1]:
                         if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i+1][0]):
                             list.append(list_tag[i+1][0])
                         else:
@@ -681,13 +698,13 @@ def YouMayAlsoLikeList():
                         list.append(list_tag[i][0])
             return list
         elif len(FiveTop) == 2:
-            list_tag = OneDiffTag(FiveTop[0], FiveTop[1])
+            list_tag = TwoDiffTags(FiveTop[0], FiveTop[1])
             list = []
             for i in range(len(list_tag)):
                 if i == len(list_tag) - 1:
                     list.append(list_tag[i][0])
                 else:
-                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                    if list_tag[i][1] == list_tag[i + 1][1]:
                         if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
                             list.append(list_tag[i + 1][0])
                         else:
@@ -696,28 +713,32 @@ def YouMayAlsoLikeList():
                         list.append(list_tag[i][0])
             return list
         elif len(FiveTop) == 3:
-            list_tag = OneDiffTag(FiveTop[0], FiveTop[1], FiveTop[2])
+            list_tag = ThreeDiffTags(FiveTop[0], FiveTop[1], FiveTop[2])
+            print(FiveTop[0][0], FiveTop[1][0], FiveTop[2][0])
+            print(list_tag)
             list = []
             for i in range(len(list_tag)):
                 if i == len(list_tag) - 1:
                     list.append(list_tag[i][0])
                 else:
-                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                    if list_tag[i][1] == list_tag[i + 1][1]:
+                        print(list_tag[i])
                         if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
                             list.append(list_tag[i + 1][0])
                         else:
                             list.append(list_tag[i][0])
                     else:
                         list.append(list_tag[i][0])
+            print(list)
             return list
         elif len(FiveTop) == 4:
-            list_tag = OneDiffTag(FiveTop[0], FiveTop[1], FiveTop[2], FiveTop[3])
+            list_tag = FourDiffTags(FiveTop[0], FiveTop[1], FiveTop[2], FiveTop[3])
             list = []
             for i in range(len(list_tag)):
                 if i == len(list_tag) - 1:
                     list.append(list_tag[i][0])
                 else:
-                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                    if list_tag[i][1] == list_tag[i + 1][1]:
                         if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
                             list.append(list_tag[i + 1][0])
                         else:
@@ -726,13 +747,13 @@ def YouMayAlsoLikeList():
                         list.append(list_tag[i][0])
             return list
         else:
-            list_tag = OneDiffTag(FiveTop[0], FiveTop[1], FiveTop[2], FiveTop[3], FiveTop[4])
+            list_tag = FiveDiffTag(FiveTop[0], FiveTop[1], FiveTop[2], FiveTop[3], FiveTop[4])
             list = []
             for i in range(len(list_tag)):
                 if i == len(list_tag) - 1:
                     list.append(list_tag[i][0])
                 else:
-                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                    if list_tag[i][1] == list_tag[i + 1][1]:
                         if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
                             list.append(list_tag[i + 1][0])
                         else:

@@ -1,12 +1,12 @@
 <!doctype html>
 
-<title>View all</title>
+<title>Search photos by tags</title>
 
 
-{% if tag_photo_all %}
-<h2>Here's all the photos with the tag you entered</h2>
+{% if listphotos %}
+<h2>Here's all the photos with the tags you entered</h2>
      <ul>
-    {% for each in tag_photo_all %}
+    {% for each in listphotos %}
 
         <li>{{each[1]}}<br>
         <img src='data:image/png;base64, {{each[0]}}'/></li>

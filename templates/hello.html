@@ -8,21 +8,25 @@
   <h1>Hello {{ name }}!</h1>
 {% endif %}
 
-{% if photos %}
+{% if photos%}
 <h2>Here're all photos</h2>
     <ul>
+
     {% for photo in photos %}
         <li>Photo ID: {{photo[2]}}<br>
             Photo caption: {{photo[1]}}<br>
-            Number of LIKEs: {{ photo[3] }}
+            Number of LIKEs: {{ photo[3] }}<br>
+        {% for ulike in ulikes%}
+            Users who liked this photo:{{ulike}}<br>
+        {% endfor %}
         </li>
         <img src='data:image/png;base64, {{photo[0]}}'/></li>
 
         <form method="post" enctype="multipart/form-data" action="/like">
                 <label for="pid">photo id you want to like:</label>
                 <input type="PID" name="pid" required='true' /><br />
-                <label for="date">date of like (in form of YYYY-MM-DD):</label>
-                <input type="DATE" name="date" required='true' /><br />
+                <label for="date">date of like:</label>
+                <input type="DATE" name="date" required='true' placeholder="YYYY-MM-DD" /><br />
                 <input type="submit" value="LIKE" />
         </form>
 
@@ -31,8 +35,8 @@
                 <input type="COMMENT" name="comment" required='true' /><br />
                 <label for="pid">photo id you want to comment on:</label>
                 <input type="PID" name="pid" required='true' /><br />
-                <label for="date">date of comment (in form of YYYY-MM-DD):</label>
-                <input type="DATE" name="date" required='true' /><br />
+                <label for="date">date of comment:</label>
+                <input type="DATE" name="date" required='true' placeholder = "YYYY-MM-DD"/><br />
                 <input type="submit" value="LEAVE YOUR COMMENT" />
         </form>
     {% endfor %}
@@ -47,7 +51,7 @@
 
 
 {% if activities %}
-<h2>5 Most Active Users</h2>
+<h2>10 Most Active Users</h2>
     <ul>
     {% for activity in activities %}
 
@@ -71,7 +75,7 @@
 
 
 {% if tags %}
-<h2>3 Most Popular Tags</h2>
+<h2>5 Most Popular Tags</h2>
     <ul>
     {% for tag in tags %}
         <form method="post" enctype="multipart/form-data" action="/viewall">
@@ -85,7 +89,7 @@
 
     <body>
         <div class="title">
-            <h1>View your photos by tags(Please enter a tag you've included in your photos uploaded)</h1>
+            <h1>View your photos by a certain tag(Please enter a tag you've included in your photos uploaded)</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/viewy">
                 <label for="tag">tag name:</label>
@@ -95,7 +99,7 @@
     </body>
     <body>
         <div class="title">
-            <h1>Search for all photos by tags</h1>
+            <h1>Search for all photos by a certain tag</h1>
         </div>
             <form method="post" enctype="multipart/form-data" action="/viewall">
                 <label for="tag">tag name:</label>
@@ -103,8 +107,17 @@
                 <input type="submit" value="Search" />
             </form>
     </body>
-
-     <body>
+    <body>
+        <div class="title">
+            <h1>Photo search by multiple tags</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/searchtags">
+                <label for="tag">tag name:</label>
+                <input type="text" name="tag" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>
+    <body>
         <div class="title">
             <h1>Search users by comments</h1>
         </div>
@@ -114,12 +127,23 @@
                 <input type="submit" value="Search" />
             </form>
     </body>
+   {# <body>
+        <div class="title">
+            <h1>You May Also Like</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/youmayalsolike">
+                <label for="content">comment content:</label>
+                <input type="CONTENT" name="content" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>#}
 
 <ul>
     <li><a href='/addfriends'>Show and add friends</a></li>
     <li><a href='/create'>Album edit</a> </li>
-<li><a href='/upload'>Photo edit</a> </li>
-<li><a href='/logout'>Logout</a></li>
-<li><a href='/'>Home</a></li>
+    <li><a href='/upload'>Photo edit</a> </li>
+    <li><a href='/logout'>Logout</a></li>
+    <li><a href="/alsolike">You May Also Like</a></li>
+    <li><a href='/'>Home</a></li>
 </ul>
 

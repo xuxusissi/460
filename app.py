@@ -24,7 +24,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'xuxu'
+app.config['MYSQL_DATABASE_PASSWORD'] = '0000'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -148,8 +148,8 @@ def register_user():
     cursor = conn.cursor()
     test = isEmailUnique(email)
     if test:
-        print(cursor.execute("INSERT INTO USER (EMAIL, PASSWORD, FNAME, LNAME, DOB, HOMETOWN, GENDER) "
-                             "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".
+        print(cursor.execute("INSERT INTO USER (EMAIL, PASSWORD, FNAME, LNAME, DOB, HOMETOWN, GENDER, CONTRIBUTION) "
+                             "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', 0)".
                              format(email, password, first_name, last_name, dob, hometown, gender)))
         conn.commit()
         # log user in
@@ -159,10 +159,7 @@ def register_user():
         return render_template('hello.html', name=email, message='Account Created!')
     else:
         print("couldn't find all tokens")
-        return flask.redirect(flask.url_for('register'),message="already exists")
-
-
-
+        return render_template('register.html', message='Already Exists!')
 
 
 
@@ -173,18 +170,25 @@ def getUIDS():
 
 def getPhotosFromAlbum(aid):
     cursor = conn.cursor()
-    cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE AID = {0}".format(aid))
+    cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE AID = '{0}'".format(aid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getUsersPhotos(uid):
     cursor = conn.cursor()
     aid = getUsersAlbums(uid)
-    cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE AID = {0}".format(aid))
+    cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE AID = '{0}'".format(aid))
     return cursor.fetchall()
+
+def selfPhoto(uid, pid):
+    cursor = conn.cursor()
+    if cursor.execute("SELECT PID, UID FROM PHOTO WHERE UID = '{0}' AND PID = '{1}'".format(uid, pid)):
+        return True
+    else:
+        return False
 
 def getPID(aid):
     cursor = conn.cursor()
-    cursor.execute("SELECT PID FROM PHOTO WHERE AID = {0}".format(aid))
+    cursor.execute("SELECT PID FROM PHOTO WHERE AID = '{0}'".format(aid))
     return cursor.fetchall()
 
 def getPIDbycaption(caption):
@@ -199,24 +203,23 @@ def getPIDByTags(tag):
 
 def getPhotosByTags(tag):
     cursor = conn.cursor()
-    pid = getPIDByTags(tag)
-    cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE PID = {0}".format(pid))
+    cursor.execute("SELECT P.DATA, A.PID, P.CAPTION FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG = '{0}'".format(tag))
     return cursor.fetchall()
 
 def getUsersAlbums(uid):
     cursor = conn.cursor()
-    cursor.execute("SELECT AID FROM ALBUM WHERE UID = {0}".format(uid))
+    cursor.execute("SELECT AID FROM ALBUM WHERE UID = '{0}'".format(uid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getUsersAlbumName(uid):
     cursor = conn.cursor()
-    cursor.execute("SELECT AID, NAME FROM ALBUM WHERE UID = {0}".format(uid))
+    cursor.execute("SELECT AID, NAME FROM ALBUM WHERE UID = '{0}'".format(uid))
     return cursor.fetchall()
 
 def getUsersAlbumsWithName(uid, name):
     cursor = conn.cursor()
-    print("SELECT AID FROM ALBUM WHERE UID = {0} AND NAME = '{1}'".format(uid, name))
-    cursor.execute("SELECT AID FROM ALBUM WHERE UID = {0} AND NAME = '{1}'".format(uid, name))
+    print("SELECT AID FROM ALBUM WHERE UID = '{0}' AND NAME = '{1}'".format(uid, name))
+    cursor.execute("SELECT AID FROM ALBUM WHERE UID = '{0}' AND NAME = '{1}'".format(uid, name))
     return cursor.fetchall()[0][0]
 
 def getUserIdFromEmail(email):
@@ -240,19 +243,28 @@ def isTagUnique(tag):
         return False
     else:
         return True
-
+def isTagExist(tag):
+    cursor = conn.cursor()
+    if cursor.execute("SELECT HASHTAG FROM TAG WHERE HASHTAG = '{0}'".format(tag)):
+        return True
+    else:
+        return False
 
 def getAllPhoto():
     cursor = conn.cursor()
     cursor.execute("SELECT P.DATA,P.CAPTION,P.PID,COUNT(L.DOC) FROM PHOTO P LEFT OUTER JOIN LIKETABLE L ON P.PID=L.PID GROUP BY P.PID")
     return cursor.fetchall()
 
-
+def getUserLike(pid):
+    cursor = conn.cursor()
+    print("SELECT DISTINCT L.UID FROM LIKETABLE L WHERE L.PID = '{0}'".format(pid))
+    cursor.execute("SELECT DISTINCT L.UID FROM LIKETABLE L WHERE L.PID = '{0}' ".format(pid))
+    return cursor.fetchall()
 
 def getAllFriendsName(uid):
     cursor=conn.cursor()
-    print("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1={0})".format(uid))
-    cursor.execute("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1={0})".format(uid))
+    print("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1='{0}')".format(uid))
+    cursor.execute("SELECT FNAME FROM USER WHERE UID IN (SELECT UID2 FROM FRIENDSHIP WHERE UID1='{0}')".format(uid))
     return cursor.fetchall()
 
 def getAllTagPhoto(tag):
@@ -270,25 +282,80 @@ def getAllTagsPhoto(tags):
 
 def mostTag():
     cursor=conn.cursor()
-    cursor.execute("SELECT HASHTAG FROM ASSOCIATE GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
+    cursor.execute("SELECT HASHTAG FROM TAG GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
+    return cursor.fetchall()
+
+def FiveTopfromUser(uid):
+    cursor=conn.cursor()
+    print("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND P.UID = '{0}' GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    cursor.execute("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND P.UID = '{0}' GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    return cursor.fetchall()
+def OneDiffTag(Tag1):
+    cursor=conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN '{0}'".format(Tag1))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN '{0}'".format(Tag1))
+    return cursor.fetchall()
+def TwoDiffTags(Tag1, Tag2):
+    cursor=conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(Tag1, Tag2))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(Tag1, Tag2))
+    return cursor.fetchall()
+def ThreeDiffTags(Tag1, Tag2, Tag3):
+    cursor = conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3))
+    return cursor.fetchall()
+def FourDiffTags(Tag1, Tag2, Tag3, Tag4):
+    cursor = conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3, Tag4))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3, Tag4))
+    return cursor.fetchall()
+
+def FiveDiffTag(Tag1, Tag2, Tag3, Tag4, Tag5):
+    cursor = conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}','{4}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+        Tag1, Tag2, Tag3, Tag4, Tag5))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}','{4}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3, Tag4, Tag5))
+    return cursor.fetchall()
+
+def NumTagsFromPID(pid):
+    cursor=conn.cursor()
+    print("SELECT COUNT(A.PID) FROM ASSOCIATE A WHERE A.PID='{0}'".format(pid))
+    cursor.execute("SELECT COUNT(A.PID) FROM ASSOCIATE A WHERE A.PID='{0}'".format(pid))
+    return cursor.fetchall()
+
+def FindPhotosWithSameTag(uid, tag):
+    cursor=conn.cursor()
+    cursor.execute("SELECT * FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND P.UID!='{0}' AND A.HASHTAG ='{1}'".format(uid, tag))
+    return cursor.fetchall()
+
+def getPhotowithMostTag(): # need to be modified
+    cursor = conn.cursor()
+    most = mostTag() #list
+    cursor.execute("SELECT PID FROM ASSOCIATE WHERE HASHTAG IN most") # a string = list
     return cursor.fetchall()
 
 def getYourTagPhoto(tag,uid):
     cursor=conn.cursor()
-    print("SELECT P.CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID={0} AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
-    cursor.execute("SELECT DATA,CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID={0} AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
+    print("SELECT P.CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID='{0}' AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
+    cursor.execute("SELECT DATA,CAPTION FROM PHOTO P,ALBUM A WHERE P.AID=A.AID AND A.UID='{0}' AND PID IN (SELECT PID FROM ASSOCIATE WHERE HASHTAG='{1}')".format(uid,tag))
     return cursor.fetchall()
 
 def getAIDFromPID(pid):
     cursor=conn.cursor()
-    print(cursor.execute("SELECT AID FROM PHOTO WHERE PID={0}".format(pid)))
-    cursor.execute("SELECT AID FROM PHOTO WHERE PID={0}".format(pid))
+    print(cursor.execute("SELECT AID FROM PHOTO WHERE PID='{0}'".format(pid)))
+    cursor.execute("SELECT AID FROM PHOTO WHERE PID='{0}'".format(pid))
     return cursor.fetchall()[0][0]
 
 def getUIDFromPID(pid):
     aid=getAIDFromPID(pid)
-    print(cursor.execute("SELECT UID FROM ALBUM WHERE AID={0}".format(aid)))
-    cursor.execute("SELECT UID FROM ALBUM WHERE AID={0}".format(aid))
+    print(cursor.execute("SELECT UID FROM ALBUM WHERE AID='{0}'".format(aid)))
+    cursor.execute("SELECT UID FROM ALBUM WHERE AID='{0}'".format(aid))
     return cursor.fetchall()[0][0]
 
 def selfComment(uid,pid):
@@ -303,7 +370,7 @@ def selfComment(uid,pid):
 
 def activeUsers():
     cursor=conn.cursor()
-    cursor.execute("SELECT FNAME,LNAME FROM USER ORDER BY CONTRIBUTION DESC LIMIT 5")
+    cursor.execute("SELECT FNAME,LNAME FROM USER ORDER BY CONTRIBUTION DESC LIMIT 10")
     return cursor.fetchall()
 
 def isCommentUnique(comment):
@@ -346,29 +413,29 @@ def upload_file():
         imgfile = request.files['photo']
         caption = request.form.get('caption')
         tag = request.form.get('tag')
-        #tag_list = tags.split(' ')
-        print(caption)
+        tag_list = tag.split(' ')
+        print(tag_list)
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
-        print("INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
+        print("INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}')".format(photo_data, aid, caption, uid))
         cursor.execute(
-            "INSERT INTO PHOTO (DATA, AID, CAPTION) VALUES ('{0}', {1}, '{2}' )".format(photo_data, aid, caption))
+            "INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}')".format(photo_data, aid, caption, uid))
         cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
         conn.commit()
-        #for i in range(0,len(tag_list)-1):
-        if isTagUnique(tag):
-            cursor.execute(
-                "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag))
-            conn.commit()
-            pid = getPIDbycaption(caption)
-            cursor.execute(
-                "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
-            conn.commit()
-        else:
-            pid = getPIDbycaption(caption)
-            cursor.execute(
-                "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag, pid))
-            conn.commit()
+        for i in range(0,len(tag_list)):
+            if isTagUnique(tag_list[i]):
+                cursor.execute(
+                    "INSERT INTO TAG (HASHTAG) VALUES ('{0}')".format(tag_list[i]))
+                conn.commit()
+                pid = getPIDbycaption(caption)
+                cursor.execute(
+                    "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag_list[i], pid))
+                conn.commit()
+            else:
+                pid = getPIDbycaption(caption)
+                cursor.execute(
+                    "INSERT INTO ASSOCIATE (HASHTAG, PID) VALUES ('{0}', {1})".format(tag_list[i], pid))
+                conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!',
                              photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
         # The method is GET so we return a  HTML form to upload the a photo.
@@ -377,42 +444,7 @@ def upload_file():
 
 
 # end photo uploading code
-
-
-@app.route('/create', methods=['GET', 'POST'])
-@flask_login.login_required
-def creat_album():
-    if request.method == 'POST':
-        uid = getUserIdFromEmail(flask_login.current_user.id)
-        aname = request.form.get('name')
-        time = request.form.get('time')
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO ALBUM (NAME, UID, DOC) VALUES ('{0}', {1}, '{2}' )".format(aname, uid, time))
-        conn.commit()
-        return render_template('hello.html', name=flask_login.current_user.id, message='Album Created!',
-                               photos=getAllPhoto(), albums=getUsersAlbumName(uid), tags=mostTag(),activities=activeUsers())
-    else:
-        return render_template('create.html', name=flask_login.current_user.id,
-                               albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
-
-@app.route('/deletealbum', methods=['GET', 'POST'])
-@flask_login.login_required
-def delete_album():
-    if request.method == 'POST':
-        uid=getUserIdFromEmail(flask_login.current_user.id)
-        aname = request.form.get('name')
-        cursor = conn.cursor()
-        cursor.execute(
-            "DELETE FROM ALBUM WHERE (NAME) VALUES ('{0}')".format(aname))
-        conn.commit()
-        return render_template('hello.html', name=flask_login.current_user.id, message='Album Deleted!',
-                                   photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
-    else:
-        return render_template('create.html', name=flask_login.current_user.id,
-                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id))
-                               )
-
+# begin photo deleting code
 @app.route('/deletephoto', methods=['GET', 'POST'])
 @flask_login.login_required
 def delete_photo():
@@ -422,15 +454,53 @@ def delete_photo():
         cursor = conn.cursor()
         pid = getPIDbycaption(caption)
         cursor.execute(
-            "DELETE FROM PHOTO WHERE CAPTION='{0}'".format(caption))
+            "DELETE FROM PHOTO WHERE CAPTION='{0}' AND AID IN (SELECT AID FROM ALBUM WHERE UID = {1})".format(caption, uid))
         conn.commit()
-        return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted!',
+        return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted if you are the owner of the photo!',
                                    photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
     else:
         return render_template('upload.html')
+# end photo deleting code
 
+# begin album creating code
+@app.route('/create', methods=['GET', 'POST'])
+@flask_login.login_required
+def creat_album():
+    if request.method == 'POST':
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        aname = request.form.get('name')
+        time = request.form.get('time')
 
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO ALBUM (NAME, UID, DOC) VALUES ('{0}', {1}, '{2}' )".format(aname, uid, time))
+        conn.commit()
+        return render_template('hello.html', name=flask_login.current_user.id, message='Album Created!',
+                               photos=getAllPhoto(), albums=getUsersAlbumName(uid), tags=mostTag(),activities=activeUsers())
+    else:
+        return render_template('create.html', name=flask_login.current_user.id,
+                               albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
+# end album creating code
+# begin album deleting code
+@app.route('/deletealbum', methods=['GET', 'POST'])
+@flask_login.login_required
+def delete_album():
+    if request.method == 'POST':
+        uid=getUserIdFromEmail(flask_login.current_user.id)
+        aname = request.form.get('name')
+        cursor = conn.cursor()
+        cursor.execute(
+            "DELETE FROM ALBUM WHERE NAME = '{0}' AND UID = {1}".format(aname, uid))
+        conn.commit()
+        return render_template('hello.html', name=flask_login.current_user.id, message='Album Deleted if you are the owner of the album!',
+                                   photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+    else:
+        return render_template('create.html', name=flask_login.current_user.id,
+                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id))
+                               )
+# end album deleting code
 
+# beging view your photo code
 @app.route('/viewy', methods=['POST'])
 @flask_login.login_required
 def view_your_photo():
@@ -438,7 +508,9 @@ def view_your_photo():
     uid=getUserIdFromEmail(flask_login.current_user.id)
     return render_template('viewyour.html', tag_photo_your=getYourTagPhoto(tag,uid))
 
+# end view your photo code
 
+# begin view all photos code
 @app.route('/viewall', methods=['POST'])
 def view_all_photo():
     tag = request.form.get('tag')
@@ -448,63 +520,102 @@ def view_all_photo():
     else:
         return render_template('viewall.html', tag_photo_all=getAllTagPhoto(tag))
 
+# end view all photos code
+
+# begin search by one or more tags code
+@app.route('/searchtags', methods=['GET','POST'])
+def search_by_tags():
+    if request.method=='POST':
+        tag = request.form.get('tag')
+        tag = tag.split(" ")
+        print(tag)
+        list_photos = []
+        for t in tag:
+            if isTagExist(t):
+                list_photos += getPhotosByTags(t)
+        print(list_photos)
+        if list_photos != []:
+            return render_template("searchtags.html", message="Here are all photos with tags", listphotos=list_photos)
+        else:
+            return render_template("hello.html", message='No photo with this tag!',
+                                      photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+    else:
+        return render_template("hello.html", photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
 
 
+# end search by one or more tags code
 
-
+# begin add friends code
 @app.route("/addfriends", methods=['GET', 'POST'])
 @flask_login.login_required
 def add_friends():
     if request.method == 'POST':
         email = request.form.get('email')
         if isEmailUnique(email):
-            return render_template('hello.html', name=flask_login.current_user.id, message='Friend does not exist!',
-                                  photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+            uid1 = getUserIdFromEmail(flask_login.current_user.id)
+            return render_template('friends.html',friends=getAllFriendsName(uid1), message = 'User does not exist.')
         else:
             uid2 = getUserIdFromEmail(email)
             uid1 = getUserIdFromEmail(flask_login.current_user.id)
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO FRIENDSHIP (UID1, UID2) VALUES ({0}, {1})".format(uid1, uid2))
+                "INSERT INTO FRIENDSHIP (UID1, UID2) VALUES ('{0}', '{1}')".format(uid1, uid2))
             conn.commit()
             return render_template('friends.html',friends=getAllFriendsName(uid1),message='Friends added!')
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
         return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
+
+# end add friends code
+
 # default page
 
+# begin add comment code
 @app.route('/comment', methods=['POST'])
-@flask_login.login_required
 def add_comment():
     pid=request.form.get('pid')
     content=request.form.get('comment')
     date=request.form.get('date')
-    if not session.get('logged_in'):
+    try:
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+    except:
         print("not logged in")
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0,pid,date,content))
+            "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ('{0}', '{1}', '{2}','{3}')".format(0, pid, date, content))
         conn.commit()
-        return render_template('hello.html',message='Your comment is added anonymously!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+        return render_template('hello.html', message='Your comment is added anonymously!', photos=getAllPhoto(),
+                               tags=mostTag(), activities=activeUsers())
+    if selfComment(uid, pid):
+        return render_template('hello.html', message='you cannot leave comments to your own photo',
+                               photos=getAllPhoto(), name=flask_login.current_user.id, tags=mostTag(),
+                               activities=activeUsers())
+
     else:
         uid = getUserIdFromEmail(flask_login.current_user.id)
-        if selfComment(uid,pid):
-            return render_template('hello.html',message='you cannot leave comments to your own photo',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
-        else:
-            cursor=conn.cursor()
-            cursor.execute("INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES({0},{1},'{2}','{3}')".format(uid,pid,date,content))
-            cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
-            conn.commit()
-            return render_template('hello.html',message='Your comment is added!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+        cursor = conn.cursor()
+        cursor.execute(
+           "INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES('{0}','{1}','{2}','{3}')".format(uid, pid, date, content))
+        cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
+        conn.commit()
+        return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
+                                   name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
+
+# end add comment code
+
+# begin search comment code
 
 @app.route('/searchcomment', methods=['POST'])
 @flask_login.login_required
 def search_comment():
     content=request.form.get('content')
     if isCommentUnique(content):
-        return render_template("hello.html",message="comments don not exist")
+        return render_template("hello.html",message="comments do not exist")
     else:
         return render_template("hello.html",message="users found!",contributors=user_by_comment(content))
+# end search commment code
+
+# begin like a photo code
 
 @app.route('/like', methods=['POST'])
 @flask_login.login_required
@@ -513,10 +624,124 @@ def likephoto():
     pid=request.form.get('pid')
     doc=request.form.get('date')
     cursor=conn.cursor()
-    cursor.execute("INSERT INTO LIKETABLE(UID,PID,DOC) VALUES({0},{1},'{2}')".format(uid,pid,doc))
+    print(uid)
+    cursor.execute("INSERT INTO LIKETABLE(UID,PID,DOC) VALUES('{0}','{1}','{2}')".format(uid,pid,doc))
     conn.commit()
-    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
+    return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(), ulikes=getUserLike(pid), name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
 
+# end like a photo code
+
+# begin you may also like code
+@app.route('/alsolike', methods=['GET'])
+@flask_login.login_required
+def YouMayAlsoLike():
+    uid=getUserIdFromEmail(flask_login.current_user.id)
+    like = YouMayAlsoLikeList()
+    list_photo = []
+    for l in like:
+        if not selfPhoto(uid, l):
+            list_photo.append(l)
+    if list_photo == []:
+        return render_template("alsolike.html", message = "Sorry, no photo recommendation for you.")
+    else:
+        list_recommandation = []
+        for i in list_photo:
+            cursor = conn.cursor()
+            cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE PID = '{0}'".format(i))
+            list_recommandation.append(cursor.fetchone())
+            return render_template('alsolike.html', message='Some Photos that You May Also Like', photos=list_recommandation())
+
+
+def YouMayAlsoLikeList():
+    uid=getUserIdFromEmail(flask_login.current_user.id)
+    FiveTop = FiveTopfromUser(uid)
+    list = []
+    if len(FiveTop) < 1:
+        return list
+    num = 0
+    for a in FiveTop:
+        if FindPhotosWithSameTag(a, uid):
+            num +=1
+    if num == 0:
+        return list
+    else:
+        if len(FiveTop) == 1:
+            list_tag = OneDiffTag(FiveTop[0])
+            list = []
+            for i in range(len(list_tag)):
+                if i == len(list_tag) - 1:
+                    list.append(list_tag[i][0])
+                else:
+                    if list_tag[i][1] -- list_tag[i+1][1]:
+                        if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i+1][0]):
+                            list.append(list_tag[i+1][0])
+                        else:
+                            list.append(list_tag[i][0])
+                    else:
+                        list.append(list_tag[i][0])
+            return list
+        elif len(FiveTop) == 2:
+            list_tag = OneDiffTag(FiveTop[0], FiveTop[1])
+            list = []
+            for i in range(len(list_tag)):
+                if i == len(list_tag) - 1:
+                    list.append(list_tag[i][0])
+                else:
+                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                        if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
+                            list.append(list_tag[i + 1][0])
+                        else:
+                            list.append(list_tag[i][0])
+                    else:
+                        list.append(list_tag[i][0])
+            return list
+        elif len(FiveTop) == 3:
+            list_tag = OneDiffTag(FiveTop[0], FiveTop[1], FiveTop[2])
+            list = []
+            for i in range(len(list_tag)):
+                if i == len(list_tag) - 1:
+                    list.append(list_tag[i][0])
+                else:
+                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                        if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
+                            list.append(list_tag[i + 1][0])
+                        else:
+                            list.append(list_tag[i][0])
+                    else:
+                        list.append(list_tag[i][0])
+            return list
+        elif len(FiveTop) == 4:
+            list_tag = OneDiffTag(FiveTop[0], FiveTop[1], FiveTop[2], FiveTop[3])
+            list = []
+            for i in range(len(list_tag)):
+                if i == len(list_tag) - 1:
+                    list.append(list_tag[i][0])
+                else:
+                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                        if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
+                            list.append(list_tag[i + 1][0])
+                        else:
+                            list.append(list_tag[i][0])
+                    else:
+                        list.append(list_tag[i][0])
+            return list
+        else:
+            list_tag = OneDiffTag(FiveTop[0], FiveTop[1], FiveTop[2], FiveTop[3], FiveTop[4])
+            list = []
+            for i in range(len(list_tag)):
+                if i == len(list_tag) - 1:
+                    list.append(list_tag[i][0])
+                else:
+                    if list_tag[i][1] - - list_tag[i + 1][1]:
+                        if NumTagsFromPID(list_tag[i][0]) > NumTagsFromPID(list_tag[i + 1][0]):
+                            list.append(list_tag[i + 1][0])
+                        else:
+                            list.append(list_tag[i][0])
+                    else:
+                        list.append(list_tag[i][0])
+            return list
+
+# end you may also like code
 
 
 @app.route("/", methods=['GET'])

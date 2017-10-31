@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% if message %}
+    <h4>{{ message }}</h4>
+{% endif %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>You May Also Like</title>
+</head>
+<body>
+{% if photos %}
+    <ul>
+        {% for photo in photos %}
+            <li>{{ photo[1]}}</li>
+            <li>{{ photo[2]}}</li>
+            <li><img src='data:image/png;base64, {{photo[0]}}'/></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</body>
+<a href='/'>Home</a>
+</html>

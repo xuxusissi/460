@@ -1,7 +1,10 @@
-<!-- author ben lawson (balawson@bu.edu) -->
 <head>
     <title>Friends</title>
 </head>
+
+{% if message %}
+    <h4>{{ message }}</h4>
+{% endif %}
 
 {% if friends %}
 <h2>Here's your friends</h2>
@@ -23,4 +26,6 @@
                 <input type="email" name="email" required='true' /><br />
                 <input type="submit" value="add" />
             </form>
+
     </body>
+<a href='/'>Home</a>

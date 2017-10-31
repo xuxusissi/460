@@ -285,6 +285,39 @@ def mostTag():
     cursor.execute("SELECT HASHTAG FROM TAG GROUP BY HASHTAG ORDER BY COUNT(*) DESC LIMIT 5")
     return cursor.fetchall()
 
+def FiveTopfromUser(uid):
+    cursor=conn.cursor()
+    print("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND UID = {0} GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    cursor.execute("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND UID = {0} GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    return cursor.fetchall()
+def OneDiffTag(Tag1):
+    cursor=conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN {0}".format(Tag1))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN {0}".format(Tag1))
+    return cursor.fetchall()
+def TwoDiffTags(Tag1, Tag2):
+    cursor=conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY COUNT(*)".format(Tag1, Tag2))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY COUNT(*)".format(Tag1, Tag2))
+    return cursor.fetchall()
+def ThreeDiffTags(Tag1, Tag2, Tag3):
+    cursor = conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
+            Tag1, Tag2, Tag3))
+    cursor.execute(
+        "SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
+            Tag1, Tag2, Tag3))
+    return cursor.fetchall()
+def FourDiffTags(Tag1, Tag2, Tag3, Tag4):
+    cursor = conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
+            Tag1, Tag2, Tag3))
+    cursor.execute(
+        "SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
+            Tag1, Tag2, Tag3))
+    return cursor.fetchall()
+
+def FiveDiffTag(Tag1, Tag2, Tag3, Tag4, Tag5):
 def getPhotowithMostTag(): # need to be modified
     cursor = conn.cursor()
     most = mostTag() #list

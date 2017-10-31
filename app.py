@@ -179,6 +179,13 @@ def getUsersPhotos(uid):
     cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE AID = {0}".format(aid))
     return cursor.fetchall()
 
+def selfPhoto(uid, pid):
+    cursor = conn.cursor()
+    if cursor.execute("SELECT PID, UID FROM PHOTO WHERE UID = {0} AND PID = {1}".format(uid, pid)):
+        return True
+    else:
+        return False
+
 def getPID(aid):
     cursor = conn.cursor()
     cursor.execute("SELECT PID FROM PHOTO WHERE AID = {0}".format(aid))
@@ -362,7 +369,7 @@ def upload_file():
         print(tag_list)
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
-        print("INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}'} )".format(photo_data, aid, caption, uid))
+        print("INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}')".format(photo_data, aid, caption, uid))
         cursor.execute(
             "INSERT INTO PHOTO (DATA, AID, CAPTION, UID) VALUES ('{0}', {1}, '{2}', '{3}')".format(photo_data, aid, caption, uid))
         cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
@@ -511,26 +518,31 @@ def add_comment():
     pid=request.form.get('pid')
     content=request.form.get('comment')
     date=request.form.get('date')
-    if session.get('logged_in'):
+    try:
         uid = getUserIdFromEmail(flask_login.current_user.id)
-        if selfComment(uid,pid):
-            return render_template('hello.html',message='you cannot leave comments to your own photo',photos=getAllPhoto(),name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
-        else:
-            uid = getUserIdFromEmail(flask_login.current_user.id)
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES({0},{1},'{2}','{3}')".format(uid, pid, date, content))
-            cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
-            conn.commit()
-            return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
-                                   name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
-    else:
+    except:
         print("not logged in")
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO COMMENT (UID,PID,DOC,CONTENT) VALUES ({0}, {1}, '{2}','{3}')".format(0, pid, date, content))
         conn.commit()
-        return render_template('hello.html', message='Your comment is added anonymously!', photos=getAllPhoto(), tags=mostTag(), activities=activeUsers())
+        return render_template('hello.html', message='Your comment is added anonymously!', photos=getAllPhoto(),
+                               tags=mostTag(), activities=activeUsers())
+    if selfComment(uid, pid):
+        return render_template('hello.html', message='you cannot leave comments to your own photo',
+                               photos=getAllPhoto(), name=flask_login.current_user.id, tags=mostTag(),
+                               activities=activeUsers())
+
+    else:
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        cursor = conn.cursor()
+        cursor.execute(
+           "INSERT INTO COMMENT(UID,PID,DOC,CONTENT) VALUES({0},{1},'{2}','{3}')".format(uid, pid, date, content))
+        cursor.execute("UPDATE USER SET CONTRIBUTION=CONTRIBUTION+1 WHERE UID={0}".format(uid))
+        conn.commit()
+        return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
+                                   name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
+
 
 
 

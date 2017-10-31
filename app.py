@@ -203,8 +203,7 @@ def getPIDByTags(tag):
 
 def getPhotosByTags(tag):
     cursor = conn.cursor()
-    pid = getPIDByTags(tag)
-    cursor.execute("SELECT DATA, PID, CAPTION FROM PHOTO WHERE PID = {0}".format(pid))
+    cursor.execute("SELECT P.DATA, A.PID, P.CAPTION FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG = '{0}'".format(tag))
     return cursor.fetchall()
 
 def getUsersAlbums(uid):

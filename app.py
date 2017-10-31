@@ -287,37 +287,53 @@ def mostTag():
 
 def FiveTopfromUser(uid):
     cursor=conn.cursor()
-    print("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND UID = {0} GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
-    cursor.execute("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND UID = {0} GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    print("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND UID = '{0}' GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
+    cursor.execute("SELECT A.HASHTAG FROM ASSOCIATE A, PHOTO P WHERE P.PID =A.PID AND UID = '{0}' GROUP BY A.HASHTAG ORDER BY COUNT(*) DESC LIMIT 5".format(uid))
     return cursor.fetchall()
 def OneDiffTag(Tag1):
     cursor=conn.cursor()
-    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN {0}".format(Tag1))
-    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN {0}".format(Tag1))
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN '{0}'".format(Tag1))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN '{0}'".format(Tag1))
     return cursor.fetchall()
 def TwoDiffTags(Tag1, Tag2):
     cursor=conn.cursor()
-    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY COUNT(*)".format(Tag1, Tag2))
-    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY COUNT(*)".format(Tag1, Tag2))
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(Tag1, Tag2))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(Tag1, Tag2))
     return cursor.fetchall()
 def ThreeDiffTags(Tag1, Tag2, Tag3):
     cursor = conn.cursor()
-    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
             Tag1, Tag2, Tag3))
-    cursor.execute(
-        "SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
             Tag1, Tag2, Tag3))
     return cursor.fetchall()
 def FourDiffTags(Tag1, Tag2, Tag3, Tag4):
     cursor = conn.cursor()
-    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
-            Tag1, Tag2, Tag3))
-    cursor.execute(
-        "SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}') GROUP BY COUNT(*)".format(
-            Tag1, Tag2, Tag3))
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3, Tag4))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3, Tag4))
     return cursor.fetchall()
 
 def FiveDiffTag(Tag1, Tag2, Tag3, Tag4, Tag5):
+    cursor = conn.cursor()
+    print("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}','{4}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+        Tag1, Tag2, Tag3, Tag4, Tag5))
+    cursor.execute("SELECT P.DATA, P.PID FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND A.HASHTAG IN ('{0}','{1}','{2}','{3}','{4}') GROUP BY P.PID ORDER BY COUNT(*) DESC".format(
+            Tag1, Tag2, Tag3, Tag4, Tag5))
+    return cursor.fetchall()
+
+def NumTagsFromPID(pid):
+    cursor=conn.cursor()
+    print("SELECT COUNT(A.HASHTAG) FROM ASSOCIATE A WHERE A.PID='{0}'".format(pid))
+    cursor.execute("SELECT COUNT(A.HASHTAG) FROM ASSOCIATE A WHERE A.PID='{0}'".format(pid))
+    return cursor.fetchall()
+
+def FindPhotosWithSameTag(uid, tag):
+    cursor=conn.cursor()
+    cursor.execute("SELECT * FROM PHOTO P, ASSOCIATE A WHERE P.PID = A.PID AND P.UID!='{0}' AND A.HASHTAG ='{1}'".format(uid, tag))
+    return cursor.fetchall()
+
 def getPhotowithMostTag(): # need to be modified
     cursor = conn.cursor()
     most = mostTag() #list
@@ -428,8 +444,25 @@ def upload_file():
 
 
 # end photo uploading code
+# begin photo deleting code
+@app.route('/deletephoto', methods=['GET', 'POST'])
+@flask_login.login_required
+def delete_photo():
+    if request.method == 'POST':
+        uid=getUserIdFromEmail(flask_login.current_user.id)
+        caption = request.form.get('caption')
+        cursor = conn.cursor()
+        pid = getPIDbycaption(caption)
+        cursor.execute(
+            "DELETE FROM PHOTO WHERE CAPTION='{0}' AND AID IN (SELECT AID FROM ALBUM WHERE UID = {1})".format(caption, uid))
+        conn.commit()
+        return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted if you are the owner of the photo!',
+                                   photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
+    else:
+        return render_template('upload.html')
+# end photo deleting code
 
-
+# begin album creating code
 @app.route('/create', methods=['GET', 'POST'])
 @flask_login.login_required
 def creat_album():
@@ -447,7 +480,8 @@ def creat_album():
     else:
         return render_template('create.html', name=flask_login.current_user.id,
                                albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id)))
-
+# end album creating code
+# begin album deleting code
 @app.route('/deletealbum', methods=['GET', 'POST'])
 @flask_login.login_required
 def delete_album():
@@ -464,25 +498,9 @@ def delete_album():
         return render_template('create.html', name=flask_login.current_user.id,
                                 albums=getUsersAlbumName(getUserIdFromEmail(flask_login.current_user.id))
                                )
+# end album deleting code
 
-@app.route('/deletephoto', methods=['GET', 'POST'])
-@flask_login.login_required
-def delete_photo():
-    if request.method == 'POST':
-        uid=getUserIdFromEmail(flask_login.current_user.id)
-        caption = request.form.get('caption')
-        cursor = conn.cursor()
-        pid = getPIDbycaption(caption)
-        cursor.execute(
-            "DELETE FROM PHOTO WHERE CAPTION='{0}' AND AID IN (SELECT AID FROM ALBUM WHERE UID = {1})".format(caption, uid))
-        conn.commit()
-        return render_template('hello.html', name=flask_login.current_user.id, message='Photo Deleted if you are the owner of the photo!',
-                                   photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
-    else:
-        return render_template('upload.html')
-
-
-
+# beging view your photo code
 @app.route('/viewy', methods=['POST'])
 @flask_login.login_required
 def view_your_photo():
@@ -490,7 +508,9 @@ def view_your_photo():
     uid=getUserIdFromEmail(flask_login.current_user.id)
     return render_template('viewyour.html', tag_photo_your=getYourTagPhoto(tag,uid))
 
+# end view your photo code
 
+# begin view all photos code
 @app.route('/viewall', methods=['POST'])
 def view_all_photo():
     tag = request.form.get('tag')
@@ -500,6 +520,9 @@ def view_all_photo():
     else:
         return render_template('viewall.html', tag_photo_all=getAllTagPhoto(tag))
 
+# end view all photos code
+
+# begin search by one or more tags code
 @app.route('/searchtags', methods=['GET','POST'])
 def search_by_tags():
     if request.method=='POST':
@@ -520,8 +543,9 @@ def search_by_tags():
         return render_template("hello.html", photos=getAllPhoto(),tags=mostTag(),activities=activeUsers())
 
 
+# end search by one or more tags code
 
-
+# begin add friends code
 @app.route("/addfriends", methods=['GET', 'POST'])
 @flask_login.login_required
 def add_friends():
@@ -542,9 +566,11 @@ def add_friends():
     else:
         return render_template('friends.html',friends=getAllFriendsName(getUserIdFromEmail(flask_login.current_user.id)))
 
+# end add friends code
 
 # default page
 
+# begin add comment code
 @app.route('/comment', methods=['POST'])
 def add_comment():
     pid=request.form.get('pid')
@@ -575,8 +601,9 @@ def add_comment():
         return render_template('hello.html', message='Your comment is added!', photos=getAllPhoto(),
                                    name=flask_login.current_user.id, tags=mostTag(), activities=activeUsers())
 
+# end add comment code
 
-
+# begin search comment code
 
 @app.route('/searchcomment', methods=['POST'])
 @flask_login.login_required
@@ -586,6 +613,9 @@ def search_comment():
         return render_template("hello.html",message="comments do not exist")
     else:
         return render_template("hello.html",message="users found!",contributors=user_by_comment(content))
+# end search commment code
+
+# begin like a photo code
 
 @app.route('/like', methods=['POST'])
 @flask_login.login_required
@@ -599,7 +629,7 @@ def likephoto():
     conn.commit()
     return render_template('hello.html',message='You liked this photo!',photos=getAllPhoto(), ulikes=getUserLike(pid), name=flask_login.current_user.id,tags=mostTag(),activities=activeUsers())
 
-
+# end like a photo code
 
 @app.route("/", methods=['GET'])
 def hello():

@@ -117,7 +117,7 @@
                 <input type="submit" value="Search" />
             </form>
     </body>
-     <body>
+    <body>
         <div class="title">
             <h1>Search users by comments</h1>
         </div>
@@ -127,12 +127,23 @@
                 <input type="submit" value="Search" />
             </form>
     </body>
+   {# <body>
+        <div class="title">
+            <h1>You May Also Like</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/youmayalsolike">
+                <label for="content">comment content:</label>
+                <input type="CONTENT" name="content" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
+    </body>#}
 
 <ul>
     <li><a href='/addfriends'>Show and add friends</a></li>
     <li><a href='/create'>Album edit</a> </li>
-<li><a href='/upload'>Photo edit</a> </li>
-<li><a href='/logout'>Logout</a></li>
-<li><a href='/'>Home</a></li>
+    <li><a href='/upload'>Photo edit</a> </li>
+    <li><a href='/logout'>Logout</a></li>
+    <li><a href="/alsolike">You May Also Like</a></li>
+    <li><a href='/'>Home</a></li>
 </ul>
 
